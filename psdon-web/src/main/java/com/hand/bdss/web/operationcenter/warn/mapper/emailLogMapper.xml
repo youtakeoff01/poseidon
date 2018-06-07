@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hand.bdss.web.entity.EmailLogEntity">
+	<insert id="insertEmailLog" parameterType="com.hand.bdss.web.entity.EmailLogEntity">
+        insert into tb_email_log
+         (email_from,email_to,send_time,content) 
+        values
+        (#{emailFrom,jdbcType=VARCHAR},#{emailTo,jdbcType=VARCHAR},SYSDATE(),#{content,jdbcType=VARCHAR})
+    </insert>
+    
+    <select id="selectEmailLogs" parameterType="com.hand.bdss.web.entity.EmailLogEntity" resultType="com.hand.bdss.web.entity.EmailLogEntity">
+         select 
+         id as id,
+         email_from as emailFrom,
+         email_to as emailTo,
+         send_time as sendTime,
+         content as content
+         from tb_email_log where 
+         1=1
+         <if test='id!=null and id!=""'>and id = #{id,jdbcType=INTEGER}</if>
+         <if test='emailFrom !=null and emailFrom !=""'>and email_from = #{emailFrom,jdbcType=VARCHAR}</if>
+         <if test='emailTo !=null and emailTo !=""'>and db_name = #{emailTo,jdbcType=VARCHAR}</if>
+         <if test='sendTime !=null and sendTime !=""'>and send_time = #{sendTime}</if>
+         <if test='content !=null and content !=""'>and content = #{content,jdbcType=VARCHAR}</if>
+    </select>
+    <select id="getCounts" parameterType="com.hand.bdss.web.entity.EmailLogEntity" resultType="int">
+        select 
+         count(1)
+         from tb_email_log where 
+         1=1
+          <if test='id!=null and id!=""'>and id = #{id,jdbcType=INTEGER}</if>
+         <if test='emailFrom !=null and emailFrom !=""'>and email_from = #{emailFrom,jdbcType=VARCHAR}</if>
+         <if test='emailTo !=null and emailTo !=""'>and db_name = #{emailTo,jdbcType=VARCHAR}</if>
+         <if test='sendTime !=null and sendTime !=""'>and send_time = #{sendTime}</if>
+         <if test='content !=null and content !=""'>and content = #{content,jdbcType=VARCHAR}</if>
+    </select>
+    
+	<insert id="insertSysErrorProp" parameterType="map" >
+        insert into tb_abnormal_proportion
+         (components_total,error_total,create_time) 
+        values
+        (#{allNums,jdbcType=VARCHAR},#{errorNums,jdbcType=VARCHAR},SYSDATE())
+    </insert>
+    <select id="listSysErrorProp" resultType="map">
+         select 
+         id as id,
+         components_total as componentsTotal,
+         error_total as errorTotal,
+         create_time as createTime
+         from tb_abnormal_proportion
+    </select>
+</mapper>

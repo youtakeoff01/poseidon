@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hand.bdss.web.entity.RoleEntity">
+    
+    <select id="selectList" parameterType="com.hand.bdss.web.entity.RoleEntity" resultType="com.hand.bdss.web.entity.RoleEntity">
+    	select 
+    	a.id as id,
+    	a.role_name as roleName,
+    	a.role_desc as roleDesc,
+    	a.`status` as status ,
+    	a.createtime as createTime,
+    	a.updatetime as updateTime
+    	from tb_role a where 
+    	1=1
+    	<if test='roleName != null and roleName != "" '>and role_name=#{roleName,jdbcType=VARCHAR}</if>
+    	<if test='roleDesc != null and roleDesc != "" '>and role_desc=#{roleDesc,jdbcType=VARCHAR}</if>
+    	<if test='status !=null and status!="" '>and `status`=#{status,jdbcType=VARCHAR}</if>
+    </select>
+    <select id="getCountAll" parameterType="com.hand.bdss.web.entity.RoleEntity" resultType="int">
+    	select 
+    	count(1)
+    	from tb_role a where 
+    	1=1
+    	<if test='roleName != null and roleName != "" '>and role_name=#{roleName,jdbcType=VARCHAR}</if>
+    	<if test='roleDesc != null and roleDesc != "" '>and role_desc=#{roleDesc,jdbcType=VARCHAR}</if>
+    	<if test='status !=null and status!="" '>and `status`=#{status,jdbcType=VARCHAR}</if>
+    </select>
+    
+    <select id="roleSelectByUseName" parameterType="list" resultType="string">
+         select c.role_name from tb_user a
+         left join tb_user_role b on a.id = b.user_id
+         left join tb_role c on b.role_id = c.id
+         where
+         a.username in 
+         <foreach collection="list" index="index" item="tag" open="("
+           separator="," close=")">
+            #{tag,jdbcType=VARCHAR} 
+        </foreach> 
+    </select>
+</mapper>

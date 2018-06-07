@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hand.bdss.web.entity.AIEvaluation">
+	<!-- 查看评估报告 -->
+	<select id="getEvaluation" parameterType="com.hand.bdss.web.entity.AIEvaluation" resultType="com.hand.bdss.web.entity.AIEvaluation">
+		select 
+		report_name as reportName,
+		report_type as reportType,
+		report_info as reportInfo
+		from tb_ai_evaluation
+		<where>
+			<if test='reportName!=null and reportName!=""'>
+				and report_name = #{reportName,jdbcType=VARCHAR}
+			</if>
+			<if test='reportType!=null and reportType!=""'>
+				and report_type = #{reportType,jdbcType=VARCHAR}
+			</if>
+		</where>
+	</select>
+	
+	<!-- 删除评估报告 -->
+	<delete id="deleteEvaluation" parameterType="com.hand.bdss.web.entity.AIEvaluation">
+		delete from tb_ai_evaluation
+		<where>
+			<if test='reportName!=null and reportName!=""'>
+				and report_name = #{reportName,jdbcType=VARCHAR}
+			</if>
+			<if test='reportType!=null and reportType!=""'>
+				and report_type = #{reportType,jdbcType=VARCHAR}
+			</if>
+		</where>
+	</delete>
+</mapper>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hand.bdss.web.entity.LastPullDateEntity">
+	<!-- 插入一条数据源信息 -->
+	<insert id="insertLastPullDate" parameterType="com.hand.bdss.web.entity.LastPullDateEntity">
+		insert into tb_last_pull_date
+		(server_name,last_pull_time,create_user,create_time,update_user,update_time)
+		values
+		(#{serverName,jdbcType=VARCHAR},#{lastPullTime,jdbcType=TIMESTAMP},#{createUser,jdbcType=VARCHAR},#{createTime,jdbcType=TIMESTAMP}
+		,#{updateUser,jdbcType=VARCHAR},#{updateTime,jdbcType=TIMESTAMP})
+	</insert>
+
+	<select id="getLastPullDate" parameterType="com.hand.bdss.web.entity.LastPullDateEntity"
+		resultType="com.hand.bdss.web.entity.LastPullDateEntity">
+		select
+		id as id,
+		server_name as serverName,
+		last_pull_time as lastPullTime,
+		create_user as createUser,
+		create_time as createTime,
+		update_user as updateUser,
+		update_time as updateTime
+		from tb_last_pull_date where
+		1=1
+		<if test='serverName !=null and serverName !=""'>and server_name = #{serverName,jdbcType=VARCHAR}</if>
+	</select>
+
+	<update id="updateLastPullDate" parameterType="com.hand.bdss.web.entity.LastPullDateEntity">
+		update tb_last_pull_date t set
+		t.last_pull_time=#{lastPullTime,jdbcType=TIMESTAMP},t.update_time=#{updateTime,jdbcType=TIMESTAMP},t.update_user=#{updateUser,jdbcType=VARCHAR}
+		where 1=1
+		<if test='serverName !=null and serverName !=""'>and server_name = #{serverName,jdbcType=VARCHAR}</if>
+	</update>
+</mapper>

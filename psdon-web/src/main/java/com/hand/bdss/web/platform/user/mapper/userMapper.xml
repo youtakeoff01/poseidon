@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hand.bdss.web.entity.UserEntity">
+   
+    <select id="listUsers" parameterType="com.hand.bdss.web.entity.UserEntity" resultType="com.hand.bdss.web.entity.UserEntity">
+          select 
+			a.id as id,
+			a.username as userName,
+			a.email as email,
+			a.user_type as userType,
+			a.phone_no as phoneNo,
+			a.password as password,
+			a.real_name as realName,
+			a.group_id as groupId,
+			b.group_name as groupName,
+			c.role_id as roleId,
+			d.role_name as roleName,
+			a.`status` as status,
+			a.create_account as createAccount,
+			a.update_account as updateAccount,
+			a.createtime as createtime,
+			a.updatetime as updatetime
+			from tb_user a 
+			left JOIN tb_group b on a.group_id = b.id
+			left JOIN tb_user_role c on a.id = c.user_id
+			left JOIN tb_role d on c.role_id = d.id
+		where 
+		1=1 and a.`status` != 2
+		<if test='userName!=null and userName!=""'>
+		    and a.username like CONCAT('%',#{userName,jdbcType=VARCHAR},'%')
+		</if>
+		<if test='password!=null and password!=""'>
+		    and a.password = #{password,jdbcType=VARCHAR}
+		</if>
+		<if test='realName!=null and realName!=""'>
+		    and a.real_name = #{realName,jdbcType=VARCHAR}
+		</if>
+		<if test='phoneNo!=null and phoneNo!=""'>
+		    and a.phone_no = #{phoneNo,jdbcType=VARCHAR}
+		</if>
+		<if test='groupId!=null and groupId!=""'>
+		    and a.group_id = #{groupId,jdbcType=INTEGER}
+		</if>
+		<if test='status!=null and status!=""'>
+		    and a.`status` = #{status,jdbcType=VARCHAR}
+		</if>
+		group by a.username
+    </select>
+    
+    <select id="getCountAll" parameterType="com.hand.bdss.web.entity.UserEntity" resultType="int">
+          select 
+			count(1)
+			from tb_user a 
+			left JOIN tb_group b on a.group_id = b.id
+			left JOIN tb_user_role c on a.id = c.user_id
+			left JOIN tb_role d on c.role_id = d.id
+		where 
+		1=1 and a.`status` != 2
+		<if test='userName!=null and userName!=""'>
+		    and a.username like CONCAT('%',#{userName,jdbcType=VARCHAR},'%')
+		</if>
+		<if test='password!=null and password!=""'>
+		    and a.password = #{password,jdbcType=VARCHAR}
+		</if>
+		<if test='realName!=null and realName!=""'>
+		    and a.real_name = #{realName,jdbcType=VARCHAR}
+		</if>
+		<if test='roleName!=null and roleName!=""'>
+		    and d.role_name = #{roleName,jdbcType=VARCHAR}
+		</if>
+		<if test='phoneNo!=null and phoneNo!=""'>
+		    and a.phone_no = #{phoneNo,jdbcType=VARCHAR}
+		</if>
+		<if test='groupId!=null and groupId!=""'>
+		    and a.group_id = #{groupId,jdbcType=INTEGER}
+		</if>
+		<if test='status!=null and status!=""'>
+		    and a.`status` = #{status,jdbcType=VARCHAR}
+		</if>
+    </select>
+    
+    <insert id="insertUser" parameterType="com.hand.bdss.web.entity.UserEntity">
+      insert into tb_user (username, email, 
+      phone_no, password, real_name, 
+      group_id, `status`,user_type,create_account, update_account,
+      createtime,updatetime)
+      values (#{userName,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, 
+      #{phoneNo,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{realName,jdbcType=BIGINT}, 
+      #{groupId,jdbcType=BIGINT}, #{status,jdbcType=VARCHAR},#{userType,jdbcType=VARCHAR},
+      #{createAccount,jdbcType=VARCHAR}, #{updateAccount,jdbcType=VARCHAR},
+      SYSDATE(),SYSDATE())
+    </insert>
+    
+    <select id="getUserIdByName" parameterType="com.hand.bdss.web.entity.UserEntity" resultType="int">
+       select id from tb_user where username=#{userName,jdbcType=VARCHAR}
+    </select>
+	<select id="getUserNameById" parameterType="java.lang.Integer" resultType="java.lang.String">
+		select username as userName from tb_user where id=#{id}
+	</select>
+	<!-- 无需改动 -->
+    <select id="checkUser" parameterType="com.hand.bdss.web.entity.UserEntity" resultType="int">
+       select count(1) from tb_user where username=#{userName,jdbcType=VARCHAR}
+    </select>
+    
+    <insert id="insertUserRole" parameterType="map">
+        insert into tb_user_role (id,user_id,role_id,createtime
+        ,create_account) values(
+        #{id,jdbcType=BIGINT},
+        #{userId,jdbcType=BIGINT},
+        #{roleId,jdbcType=BIGINT},
+        SYSDATE(), 
+        #{createCount,jdbcType=VARCHAR}
+        )
+    </insert>
+    
+    <update id="updateUser" parameterType="com.hand.bdss.web.entity.UserEntity">
+        update tb_user set 
+			username =#{userName,jdbcType=VARCHAR},
+			user_type=#{userType,jdbcType=VARCHAR},
+			email = #{email,jdbcType=VARCHAR},
+			phone_no = #{phoneNo,jdbcType=VARCHAR},
+			real_name = #{realName,jdbcType=VARCHAR},
+			group_id = #{groupId,jdbcType=BIGINT},
+			`status` = #{status,jdbcType=VARCHAR},
+			update_account = #{updateAccount,jdbcType=VARCHAR},
+			updatetime = SYSDATE()
+         where id = #{id,jdbcType=BIGINT} 
+    </update>
+    
+    <update id="updateUserRole" parameterType="com.hand.bdss.web.entity.UserEntity">
+        update tb_user_role set
+           role_id = #{roleId,jdbcType=BIGINT},
+           updatetime = SYSDATE(),
+		   update_account = #{updateAccount,jdbcType=VARCHAR}
+         where user_id = #{id,jdbcType=BIGINT}
+    </update>
+    <delete id="deleteUser" parameterType="list">
+        delete from tb_user
+        where id in 
+        <foreach collection="list" index="index" item="tag" open="("
+           separator="," close=")">
+        #{tag.id,jdbcType=BIGINT} 
+        </foreach>
+    </delete>
+    
+    <delete id="deleteUserRole" parameterType="list">
+        delete from tb_user_role where user_id in 
+        <foreach collection="list" index="index" item="tag" open="("
+           separator="," close=")">
+        #{tag,jdbcType=BIGINT} 
+        </foreach>
+    </delete>
+    
+    <select id="getMenuByUser" parameterType="string" resultType="string">
+       select distinct d.code FROM tb_user a
+	   LEFT JOIN tb_user_role b 	ON a.id = b.user_id
+	   LEFT JOIN tb_oper_role c ON b.role_id = c.role_id
+	   LEFT JOIN tb_operation d ON c.oper_id = d.id
+       where a.username = #{userName,jdbcType=VARCHAR}
+    </select>
+    <!-- 不需要改动 -->
+    <select id="getUser" parameterType="com.hand.bdss.web.entity.UserEntity" resultType="com.hand.bdss.web.entity.UserEntity">
+    select 
+			a.id as id,
+			a.username as userName,
+			a.user_type as userType,
+			a.email as email,
+			a.phone_no as phoneNo,
+			a.password as password,
+			a.real_name as realName,
+			a.group_id as groupId,
+			b.group_name as groupName,
+			c.role_id as roleId,
+			d.role_name as roleName,
+			a.`status` as status,
+			a.create_account as createAccount,
+			a.update_account as updateAccount,
+			a.createtime as createtime,
+			a.updatetime as updatetime
+			from tb_user a 
+			left JOIN tb_group b on a.group_id = b.id
+			left JOIN tb_user_role c on a.id = c.user_id
+			left JOIN tb_role d on c.role_id = d.id
+		where 
+		1=1
+		<if test='userName!=null and userName!=""'>
+		    and a.username = #{userName,jdbcType=VARCHAR}
+		</if>
+		<if test='password!=null and password!=""'>
+		    and a.password = #{password,jdbcType=VARCHAR}
+		</if>
+		<if test='userType!=null and userType!=""'>
+		    and a.user_type = #{userType,jdbcType=VARCHAR}
+		</if>
+		<if test='realName!=null and realName!=""'>
+		    and a.real_name = #{realName,jdbcType=VARCHAR}
+		</if>
+		<if test='phoneNo!=null and phoneNo!=""'>
+		    and a.phone_no = #{phoneNo,jdbcType=VARCHAR}
+		</if>
+		<if test='groupId!=null and groupId!=""'>
+		    and a.group_id = #{groupId,jdbcType=INTEGER}
+		</if>
+		<if test='status!=null and status!=""'>
+		    and a.`status` = #{status,jdbcType=VARCHAR}
+		</if>
+    </select>
+    
+    <!-- <select id="getMenuByLdapUser" parameterType="string" resultType="string">
+       select distinct d.code FROM tb_ldapuser_role a
+	   LEFT JOIN tb_oper_role c ON a.role_id = c.role_id
+	   LEFT JOIN tb_operation d ON c.oper_id = d.id
+       where a.uid = #{userName,jdbcType=VARCHAR}
+    </select> -->
+    
+    <update id="resetUserPassword" parameterType="com.hand.bdss.web.entity.UserEntity">
+        update tb_user set 
+			password = #{password,jdbcType=VARCHAR},
+			updatetime = SYSDATE()
+         where id = #{id,jdbcType=BIGINT} 
+    </update>
+    
+    <select id="listTeacherMsgs" parameterType="com.hand.bdss.web.entity.UserEntity" resultType="com.hand.bdss.web.entity.UserEntity">
+          select 
+			a.id as id,
+			a.username as userName,
+			a.email as email,
+			a.phone_no as phoneNo,
+			a.real_name as realName,
+			a.group_id as groupId,
+			b.group_name as groupName,
+			c.role_id as roleId,
+			d.role_name as roleName,
+			a.`status` as status,
+			a.create_account as createAccount,
+			a.update_account as updateAccount,
+			a.createtime as createtime,
+			a.updatetime as updatetime
+			from tb_user a 
+			left JOIN tb_group b on a.group_id = b.id
+			left JOIN tb_user_role c on a.id = c.user_id
+			left JOIN tb_role d on c.role_id = d.id
+		where 
+		1=1 and a.`status` != 2 
+		<if test='userType!=null and userType!=""'>
+		    and a.user_type = #{userType,jdbcType=VARCHAR} 
+		</if>
+		<if test='userName!=null and userName!=""'>
+		    and a.username like CONCAT('%',#{userName,jdbcType=VARCHAR},'%')
+		</if>
+		<if test='realName!=null and realName!=""'>
+		    and a.real_name = #{realName,jdbcType=VARCHAR}
+		</if>
+		<if test='phoneNo!=null and phoneNo!=""'>
+		    and a.phone_no = #{phoneNo,jdbcType=VARCHAR}
+		</if>
+		<if test='groupId!=null and groupId!=""'>
+		    and a.group_id = #{groupId,jdbcType=INTEGER}
+		</if>
+		<if test='roleId!=null and roleId!=""'>
+		    and d.id = #{roleId,jdbcType=INTEGER}
+		</if>
+		<if test='roleName!=null and roleName!=""'>
+		    and d.role_name = #{roleName,jdbcType=VARCHAR}
+		</if>
+		<if test='status!=null and status!=""'>
+		    and a.`status` = #{status,jdbcType=VARCHAR}
+		</if>
+    </select>
+</mapper>

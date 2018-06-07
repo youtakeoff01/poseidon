@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hand.bdss.web.entity.ScriptRuleEntity">
+    <insert id="insertScript" parameterType="com.hand.bdss.web.entity.ScriptRuleEntity">
+        insert into tb_script_info (
+        script_title,script_desc,script_state,script_trievent,script_content,create_datetime,create_user,update_datetime,update_user
+        )
+        values(#{scriptTitle,jdbcType=VARCHAR},#{scriptDesc,jdbcType=VARCHAR},#{scriptState,jdbcType=VARCHAR},#{triggerEvent,jdbcType=VARCHAR},#{scriptContent,jdbcType=VARCHAR},SYSDATE(),#{createUser,jdbcType=VARCHAR},SYSDATE(),#{createUser,jdbcType=VARCHAR})
+    </insert>
+    <select id="seletScript" parameterType="com.hand.bdss.web.entity.ScriptRuleEntity" resultType="com.hand.bdss.web.entity.ScriptRuleEntity">
+        SELECT id as id,
+        script_title as scriptTitle,
+        script_desc as scriptDesc,
+        script_state as scriptState,
+        script_trievent as triggerEvent,
+        script_content as scriptContent,
+        update_datetime as updateDatetime,
+        create_datetime as createDatetime,
+        update_user as updateUser
+        from tb_script_info
+        where 1=1
+        <if test='scriptTitle !=null and scriptTitle !=""'>AND script_title LIKE CONCAT('%',#{scriptTitle,jdbcType=VARCHAR},'%')</if>
+        order by create_datetime desc
+    </select>
+    <select id="seletCountScript" parameterType="com.hand.bdss.web.entity.ScriptRuleEntity" resultType="int">
+        SELECT count(1)
+        from tb_script_info
+        where 1=1
+        <if test='scriptTitle !=null and scriptTitle !=""'>AND script_title LIKE CONCAT('%',#{scriptTitle,jdbcType=VARCHAR},'%')</if>
+    </select>
+    <update id="updateScript" parameterType="com.hand.bdss.web.entity.ScriptRuleEntity">
+        UPDATE tb_script_info a SET
+        a.script_title = #{scriptTitle,jdbcType=VARCHAR},
+        a.script_desc = #{scriptDesc,jdbcType=VARCHAR},
+        a.script_state = #{scriptState,jdbcType=VARCHAR},
+        a.script_trievent = #{script_trievent,jdbcType=VARCHAR},
+        a.script_content = #{scriptContent,jdbcType=VARCHAR},
+        a.update_user = #{updateUser,jdbcType=VARCHAR}
+        where
+        1=1
+        <if test=' id !=null and id !=""'>and id = #{id,jdbcType=BIGINT}</if>
+    </update>
+    <delete id="deleteScript" parameterType="list">
+        DELETE from tb_script_info where id in
+        <foreach collection="list" index="index" item="tag" open="("
+                 separator="," close=")">
+            #{tag.id,jdbcType=BIGINT}
+        </foreach>
+    </delete>
+</mapper>

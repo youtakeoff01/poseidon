@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hand.bdss.web.entity.LogEntity">
+    <!-- 插入一条系统日志信息  -->
+    <insert id="insert" parameterType="com.hand.bdss.web.entity.LogEntity">
+        insert into tb_syslog(log_type,log_content,operation_name,createtime,`status`)
+        values(#{logType,jdbcType=VARCHAR},#{logContent,jdbcType=VARCHAR},#{userName,jdbcType=VARCHAR},SYSDATE(),#{status,jdbcType=VARCHAR})
+    </insert>
+    
+    <select id="selectList" parameterType="com.hand.bdss.web.entity.LogEntity" resultType="com.hand.bdss.web.entity.LogEntity">
+    	select 
+    	a.id as id,
+    	a.log_type as logType,
+    	a.log_content as logContent,
+    	a.operation_name as userName,
+    	a.createtime as createTime,
+    	a.`status` as status
+    	from tb_syslog a
+    	where 
+    	1=1
+    	<if test='logType !=null and logType != "" '>and log_type like CONCAT('%',#{logType,jdbcType=VARCHAR},'%')</if>
+    	<if test='logContent !=null and logContent != "" '>and log_content=#{logContent,jdbcType=VARCHAR}</if>
+    	<if test='userName != null and userName!="" '>and operation_name=#{userName,jdbcType=VARCHAR}</if>
+    	<if test='createTime !=null and createTime != "" '>and createtime=#{createTime,jdbcType=VARCHAR}</if>
+    	<if test='status!=null and status!=""'>and `status` = #{status,jdbcType=VRACHAR}</if>
+    	order by createtime desc 
+    </select>
+    <select id="getCountAll" parameterType="com.hand.bdss.web.entity.LogEntity" resultType="int">
+    	select 
+    	count(1)
+    	from tb_syslog a
+    	where 
+    	1=1
+    	<if test='logType !=null and logType != "" '>and log_type like CONCAT('%',#{logType,jdbcType=VARCHAR},'%')</if>
+    	<if test='logContent !=null and logContent != "" '>and log_content=#{logContent,jdbcType=VARCHAR}</if>
+    	<if test='userName != null and userName!="" '>and operation_name=#{userName,jdbcType=VARCHAR}</if>
+    	<if test='createTime !=null and createTime != "" '>and createtime=#{createTime,jdbcType=VARCHAR}</if>
+    	<if test='status!=null and status!=""'>and `status` = #{status,jdbcType=VRACHAR}</if>
+    </select>
+    
+    <delete id="deleteLog" parameterType="list">
+    	delete from tb_syslog where id in
+    	<foreach collection="list" index="index" item="tag" open="(" separator="," close=")">
+    		#{tag.id,jdbcType=BIGINT}
+    	</foreach>
+    </delete>
+</mapper>

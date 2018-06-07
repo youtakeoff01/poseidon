@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hand.bdss.web.entity.JarInfoEntity">
+	<insert id="insertJarInfo" parameterType="com.hand.bdss.web.entity.JarInfoEntity"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into tb_jar_info (
+		jar_name,jar_path,create_user,create_time,update_user,update_time
+		)values(#{jarName,jdbcType=VARCHAR},#{jarPath,jdbcType=VARCHAR},#{createUser,jdbcType=VARCHAR},SYSDATE(),#{createUser,jdbcType=VARCHAR},SYSDATE())
+	</insert>
+
+	<select id="listTaskJars" parameterType="com.hand.bdss.web.entity.JarInfoEntity"
+		resultType="com.hand.bdss.web.entity.JarInfoEntity">
+		select
+		id as id,
+		jar_name as jarName,
+		jar_path as jarPath,
+		create_user as createUser,
+		create_time as createTime,
+		update_user as updateUser,
+		update_time as updateTime
+		from tb_jar_info a
+		where
+		1=1
+		<if test='id!=null and id!=""'>and id = #{id,jdbcType=BIGINT}</if>
+		<if test='jarName!=null and jarName!=""'>and jar_name like
+			CONCAT('%',#{jarName,jdbcType=VARCHAR},'%')</if>
+		<if test='jarPath!=null and jarPath!=""'>and jar_path = #{jarPath,jdbcType=VARCHAR}</if>
+		<if test='createUser!=null and createUser!=""'>and create_user = #{createUser,jdbcType=VARCHAR}</if>
+		order by create_time desc
+	</select>
+	
+	<select id="listTaskJarCounts" parameterType="com.hand.bdss.web.entity.JarInfoEntity"
+		resultType="int">
+		select
+		count(1)
+		from tb_jar_info a
+		where
+		1=1
+		<if test='id!=null and id!=""'>and id = #{id,jdbcType=BIGINT}</if>
+		<if test='jarName!=null and jarName!=""'>and jar_name like
+			CONCAT('%',#{jarName,jdbcType=VARCHAR},'%')</if>
+		<if test='jarPath!=null and jarPath!=""'>and jar_path = #{jarPath,jdbcType=VARCHAR}</if>
+		<if test='createUser!=null and createUser!=""'>and create_user = #{createUser,jdbcType=VARCHAR}</if>
+	</select>
+
+	<delete id="deleteJarInfos" parameterType="list">
+		delete from tb_jar_info where id in
+		<foreach collection="list" index="index" item="tag" open="("
+			separator="," close=")">
+			#{tag.id,jdbcType=BIGINT}
+		</foreach>
+	</delete>
+</mapper>

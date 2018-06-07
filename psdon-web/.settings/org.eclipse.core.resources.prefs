@@ -1,0 +1,8 @@
+eclipse.preferences.version=1
+encoding//src/main/java=UTF-8
+encoding//src/main/resources/prd=UTF-8
+encoding//src/main/resources/prd/global.properties=UTF-8
+encoding//src/main/resources/prd/ldapconnect.properties=UTF-8
+encoding//src/main/resources/prd/splunkconnect.properties=UTF-8
+encoding//src/test/java=UTF-8
+encoding/<project>=UTF-8

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hand.bdss.web.entity.UserGroupEntity">    
+      
+    <!-- 用户组的增删改查 -->
+      
+    <insert id="insertUsergroup" parameterType="com.hand.bdss.web.entity.UserGroupEntity">
+      insert into tb_group (id, group_name, group_pinyin, 
+      group_code, group_parent, group_desc,`status`,
+      createtime)
+      values (#{id,jdbcType=BIGINT}, #{groupName,jdbcType=VARCHAR}, #{groupPinYin,jdbcType=VARCHAR}, 
+      #{groupCode,jdbcType=VARCHAR}, #{groupParent,jdbcType=BIGINT}, #{groupDesc,jdbcType=VARCHAR},'0',     
+      SYSDATE())
+    </insert>
+
+    <delete id="deleteUsergroup" parameterType="list">
+    	delete from tb_group where id in
+    	<foreach collection="list" index="index" item="tag" open="(" separator="," close=")">
+    		#{tag.id,jdbcType=BIGINT}
+    	</foreach>
+    </delete>
+    
+    <update id="updateUsergroup" parameterType="com.hand.bdss.web.entity.UserGroupEntity">
+        update tb_group set 
+        	id=#{id,jdbcType=BIGINT},
+			group_name =#{groupName,jdbcType=VARCHAR},
+			group_pinyin = #{groupPinYin,jdbcType=VARCHAR},
+			group_code = #{groupCode,jdbcType=VARCHAR},
+			group_parent = #{groupParent,jdbcType=BIGINT},
+			group_desc = #{groupDesc,jdbcType=VARCHAR},
+			`status` = #{status,jdbcType=VARCHAR},
+			updatetime = SYSDATE()
+         where id = #{id,jdbcType=BIGINT} 
+    </update>
+    
+    <select id="listUsergroup" parameterType="com.hand.bdss.web.entity.UserGroupEntity" resultType="com.hand.bdss.web.entity.UserGroupEntity">
+          select 
+			a.id as id,
+			a.group_name as groupName,
+			a.group_pinyin as groupPinYin,
+			a.group_code as groupCode,
+			a.group_parent as groupParent,
+			a.`status` as status,
+			a.group_desc as groupDesc,
+			a.createtime as createTime,
+			a.updatetime as updateTime
+			from tb_group a 
+		where 
+		1=1
+		and a.`status` != '2'
+		<if test='groupName!=null and groupName!=""'>
+		    and group_name like CONCAT('%',#{groupName,jdbcType=VARCHAR},'%')
+		</if>
+		<if test='groupPinYin!=null and groupPinYin!=""'>
+		    and group_pinyin = #{groupPinYin,jdbcType=VARCHAR}
+		</if>
+		<if test='groupCode!=null and groupCode!=""'>
+		    and group_code = #{groupCode,jdbcType=VARCHAR}
+		</if>
+		<if test='groupParent!=null and groupParent!=""'>
+		    and group_parent = #{groupParent,jdbcType=BIGINT}
+		</if>
+		<!-- <if test='status !=null and status!=""'>
+		    and status = #{status,jdbcType=VARCHAR}
+		</if> -->
+    </select>
+    
+     <select id="getGroup" parameterType="com.hand.bdss.web.entity.UserGroupEntity" resultType="com.hand.bdss.web.entity.UserGroupEntity">
+          select 
+			a.id as id,
+			a.group_name as groupName,
+			a.group_pinyin as groupPinYin,
+			a.group_code as groupCode,
+			a.group_parent as groupParent,
+			a.`status` as status,
+			a.group_desc as groupDesc,
+			a.createtime as createTime,
+			a.updatetime as updateTime
+			from tb_group a 
+		where 
+		1=1
+		<if test='groupName!=null and groupName!=""'>
+		    and group_name like CONCAT('%',#{groupName,jdbcType=VARCHAR},'%')
+		</if>
+		<if test='groupPinYin!=null and groupPinYin!=""'>
+		    and group_pinyin = #{groupPinYin,jdbcType=VARCHAR}
+		</if>
+		<if test='groupCode!=null and groupCode!=""'>
+		    and group_code = #{groupCode,jdbcType=VARCHAR}
+		</if>
+		<if test='groupParent!=null and groupParent!=""'>
+		    and group_parent = #{groupParent,jdbcType=BIGINT}
+		</if>
+		<!-- <if test='status !=null and status!=""'>
+		    and status = #{status,jdbcType=VARCHAR}
+		</if> -->
+    </select>
+    
+    <select id="getCountAll" parameterType="com.hand.bdss.web.entity.UserGroupEntity" resultType="int">
+         select 
+			count(1)
+		from tb_group a 
+		where 
+		1=1 
+		and a.`status` != '2'
+		<if test='groupName!=null and groupName!=""'>
+		    and group_name like CONCAT('%',#{groupName,jdbcType=VARCHAR},'%')
+		</if>
+		<if test='groupPinYin!=null and groupPinYin!=""'>
+		    and group_pinyin = #{groupPinYin,jdbcType=VARCHAR}
+		</if>
+		<if test='groupCode!=null and groupCode!=""'>
+		    and group_code = #{groupCode,jdbcType=VARCHAR}
+		</if>
+		<if test='groupParent!=null and groupParent!=""'>
+		    and group_parent = #{groupParent,jdbcType=BIGINT}
+		</if>
+		<!-- <if test='status !=null and status!=""'>
+		    and status = #{status,jdbcType=INTEGER}
+		</if> -->
+    </select>
+    
+    <select id="checkUserGroup" parameterType="com.hand.bdss.web.entity.UserGroupEntity" resultType="int">
+    	select count(1) from tb_group where 1=1 and group_name = #{groupName,jdbcType=VARCHAR}
+    </select>
+</mapper>

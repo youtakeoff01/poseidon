@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hand.bdss.dsmp.model.ServiceStatus">
+    <insert id="insertServiceStatus" parameterType="com.hand.bdss.dsmp.model.ServiceStatus">
+       insert into tb_service_status
+       	(hostname,servicename,comname,state,updatetime)
+       values 
+       	(#{hostName,jdbcType=VARCHAR},#{serviceName,jdbcType=VARCHAR},#{comName,jdbcType=VARCHAR},
+       	#{state,jdbcType=VARCHAR},SYSDATE())
+    </insert>
+    
+    <select id="getServiceStatus" parameterType="com.hand.bdss.dsmp.model.ServiceStatus" resultType="com.hand.bdss.dsmp.model.ServiceStatus">
+    	select 
+    	id as id,
+    	hostname as hostName,
+    	servicename as serviceName,
+    	comname as comName,
+    	state as state,
+    	updatetime as updateTime
+    	from tb_service_status
+    	where 1=1
+    	<if test='hostName!=null and hostName!=""'>and hostname = #{hostName,jdbcType=VARCHAR}</if>
+    	<if test='serviceName!=null and serviceName!=""'>and servicename = #{serviceName,jdbcType=VARCHAR}</if>
+    	<if test='comName!=null and comName!=""'>and comname = #{comName,jdbcType=VARCHAR}</if>
+    </select>
+     
+    <select id="listServiceStatusAll" parameterType="com.hand.bdss.dsmp.model.ServiceStatus" resultType="com.hand.bdss.dsmp.model.ServiceStatus">
+    	select 
+    	id as id,
+    	hostname as hostName,
+    	servicename as serviceName,
+    	comname as comName,
+    	state as state,
+    	updatetime as updateTime
+    	from tb_service_status
+    	where 1=1
+    	<if test='id!=null and id!=""'>and id = #{id,jdbcType=VARCHAR}</if>
+    	<if test='hostName!=null and hostName!=""'>and hostName = #{hostName,jdbcType=VARCHAR}</if>
+    	<if test='serviceName!=null and serviceName!=""'>and servicename = #{serviceName,jdbcType=VARCHAR}</if>
+    	<if test='comName!=null and comName!=""'>and comname = #{comName,jdbcType=VARCHAR}</if>
+    	<if test='state!=null and state!=""'>and state = #{state,jdbcType=VARCHAR}</if>
+    	<if test='updateTime!=null and updateTime!=""'>and updatetime = #{updateTime,jdbcType=VARCHAR}</if>
+    </select>
+    
+    <update id="updateServiceStatus" parameterType="com.hand.bdss.dsmp.model.ServiceStatus">
+    	update tb_service_status set 
+    	id = #{id,jdbcType=VARCHAR},
+    	comname = #{comName,jdbcType=VARCHAR},
+    	servicename = #{serviceName,jdbcType=VARCHAR},
+    	comname = #{comName,jdbcType=VARCHAR},
+    	state = #{state,jdbcType=VARCHAR},
+    	updatetime = SYSDATE()
+    	where 1=1
+		<if test='id!=null and id!=""'>and id = #{id,jdbcType=INTEGER}</if>
+    </update>
+    
+    <select id="getServiceComState" parameterType="com.hand.bdss.dsmp.model.ServiceStatus" resultType="com.hand.bdss.web.entity.ComStateNumEntity">
+    	select 
+    	comname as comName,
+    	sum(case when state='1' then 1 ELSE 0 END) as normalNum,
+    	sum(case when state='0' then 1 ELSE 0 END) as unnormalNum
+		from tb_service_status 
+		where 1=1
+		<if test='serviceName !=null and serviceName !=""'>and servicename = #{serviceName,jdbcType=VARCHAR}</if>
+		group by comname
+    </select>
+ </mapper>

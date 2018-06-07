@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hand.bdss.web.entity.MetaDataEntity">
+	<insert id="insertMataData" parameterType="com.hand.bdss.web.entity.MetaDataEntity">
+		insert into tb_metadata (
+		meta_name,meta_type,db_name,table_name,meta_hiveFields,meta_location,meta_live,meta_owner,meta_desc,createtime
+		)
+		values
+		(#{metaName,jdbcType=VARCHAR},#{metaType,jdbcType=VARCHAR},#{dbName,jdbcType=VARCHAR},#{tableName,jdbcType=VARCHAR},
+		#{metaHiveFields,jdbcType=VARCHAR},#{metaLocation},#{metaLive,jdbcType=INTEGER},
+		#{metaOwner,jdbcType=BIGINT},#{metaDesc,jdbcType=VARCHAR},SYSDATE())
+	</insert>
+
+	<delete id="deleteMetaData" parameterType="list">
+		delete from tb_metadata where
+		id in
+		<foreach collection="list" index="index" item="tag" open="("
+			separator="," close=")">
+			#{tag.id,jdbcType=BIGINT}
+		</foreach>
+	</delete>
+
+	<delete id="deleteMetaDataByName" parameterType="list">
+		delete from tb_metadata where
+		table_name in
+		<foreach collection="list" index="index" item="tag" open="("
+			separator="," close=")">
+			#{tag.tableName,jdbcType=VARCHAR}
+		</foreach>
+	</delete>
+
+	<delete id="deleteMetaDataByLocation" parameterType="list">
+		delete from tb_metadata where
+		meta_location in
+		<foreach collection="list" index="index" item="tag" open="("
+			separator="," close=")">
+			#{tag.metaLocation,jdbcType=VARCHAR}
+		</foreach>
+	</delete>
+
+	<update id="updateMetaData" parameterType="com.hand.bdss.web.entity.MetaDataEntity">
+		update tb_metadata a set
+		a.meta_name = #{metaName,jdbcType=VARCHAR},
+		a.meta_type = #{metaType,jdbcType=VARCHAR},
+		a.db_name = #{dbName,jdbcType=VARCHAR},
+		a.table_name = #{tableName,jdbcType=VARCHAR},
+		a.meta_hiveFields = #{metaHiveFields,jdbcType=VARCHAR},
+		a.meta_location = #{metaLocation},
+		a.meta_live = #{metaLive,jdbcType=INTEGER},
+		a.meta_owner = #{metaOwner,jdbcType=BIGINT},
+		a.meta_desc = #{metaDesc,jdbcType=VARCHAR},
+		a.updatetime = SYSDATE()
+		where a.id = #{id}
+	</update>
+
+	<update id="updateRename" parameterType="java.util.Map">
+		update tb_metadata a set
+		a.meta_name = #{newMetaName},
+		a.meta_location = #{newLoaction}
+		where a.meta_name = #{oldMetaName}
+	</update>
+
+	<update id="updateMetaDataByName" parameterType="com.hand.bdss.web.entity.MetaDataEntity">
+		update tb_metadata a set
+		a.meta_name = #{metaName,jdbcType=VARCHAR},
+		a.meta_type = #{metaType,jdbcType=VARCHAR},
+		a.db_name = #{dbName,jdbcType=VARCHAR},
+		a.table_name = #{tableName,jdbcType=VARCHAR},
+		a.meta_hiveFields = #{metaHiveFields,jdbcType=VARCHAR},
+		a.meta_location = #{metaLocation},
+		a.meta_live = #{metaLive,jdbcType=INTEGER},
+		a.meta_owner = #{metaOwner,jdbcType=BIGINT},
+		a.meta_desc = #{metaDesc,jdbcType=VARCHAR},
+		a.updatetime = SYSDATE()
+		where
+		1=1
+		<if test='dbName!=null and dbName!=""'>and db_name = #{dbName,jdbcType=VARCHAR}</if>
+		<if test='tableName!=null and tableName!=""'>and table_name = #{tableName,jdbcType=VARCHAR}</if>
+		<if test='metaLocation !=null and metaLocation!=""'>and meta_location = #{metaLocation}</if>
+	</update>
+
+	<select id="listMetaDataEntity" parameterType="com.hand.bdss.web.entity.MetaDataEntity"
+		resultType="com.hand.bdss.web.entity.MetaDataEntity">
+		select
+		a.id as id,
+		a.meta_name as metaName,
+		a.meta_type as metaType,
+	    a.db_name as dbName,
+		a.table_name as tableName,
+		a.meta_hiveFields as metaHiveFields,
+		a.meta_location as metaLocation,
+		a.meta_live as metaLive,
+		a.meta_owner as metaOwner,
+		b.username as userName,
+		a.meta_desc as metaDesc,
+		a.createtime as createTime,
+		a.updatetime as updateTime
+		from tb_metadata a left join tb_user b on a.meta_owner = b.id
+		where
+		1=1
+		and meta_type != 'hdfs'
+		<if test='metaName!=null and metaName!=""'>and meta_name = #{metaName,jdbcType=VARCHAR}</if>
+		<if test='metaType!=null and metaType!=""'>and meta_type = #{metaType,jdbcType=VARCHAR}</if>
+		<if test='dbName!=null and dbName!=""'>and db_name = #{dbName,jdbcType=VARCHAR}</if>
+		<if test='tableName!=null and tableName!=""'>and table_name like
+			CONCAT('%',#{tableName,jdbcType=VARCHAR},'%')</if>
+		<if test='metaHiveFields!=null and metaHiveFields!=""'>and meta_hiveFields = #{metaHiveFields,jdbcType=VARCHAR}
+		</if>
+		<if test='metaLocation !=null and metaLocation!=""'>and meta_location = #{metaLocation}</if>
+		<if test='metaLive!=null and metaLive!=""'>and meta_live = #{metaLive,jdbcType=INTEGER}</if>
+		<if test='metaOwner!=null and metaOwner!=""'>and meta_owner = #{metaOwner,jdbcType=BIGINT}</if>
+		<if test='metaDesc!=null and metaDesc!=""'>and meta_desc = #{metaDesc,jdbcType=VARCHAR}</if>
+		<if test='createTime!=null and createTime!=""'>and createtime = #{createTime}</if>
+		<if test='updateTime!=null and updateTime!=""'>and updatetime = #{updateTime}</if>
+		ORDER BY createtime DESC;
+	</select>
+
+	<select id="listCountAll" parameterType="com.hand.bdss.web.entity.MetaDataEntity"
+		resultType="int">
+		select
+		count(1)
+		from tb_metadata a left join tb_user b on a.meta_owner = b.id
+		where
+		1=1
+		and meta_type != 'hdfs'
+		<if test='metaName!=null and metaName!=""'>and meta_name = #{metaName,jdbcType=VARCHAR}</if>
+		<if test='metaType!=null and metaType!=""'>and meta_type = #{metaType,jdbcType=VARCHAR}</if>
+		<if test='dbName!=null and dbName!=""'>and db_name = #{dbName,jdbcType=VARCHAR}</if>
+		<if test='tableName!=null and tableName!=""'>and table_name like
+			CONCAT('%',#{tableName,jdbcType=VARCHAR},'%')</if>
+		<if test='metaHiveFields!=null and metaHiveFields!=""'>and meta_hiveFields = #{metaHiveFields,jdbcType=VARCHAR}
+		</if>
+		<if test='metaLocation !=null and metaLocation!=""'>and meta_location = #{metaLocation}</if>
+		<if test='metaLive!=null and metaLive!=""'>and meta_live = #{metaLive,jdbcType=INTEGER}</if>
+		<if test='metaOwner!=null and metaOwner!=""'>and meta_owner = #{metaOwner,jdbcType=BIGINT}</if>
+		<if test='metaDesc!=null and metaDesc!=""'>and meta_desc = #{metaDesc,jdbcType=VARCHAR}</if>
+		<if test='createTime!=null and createTime!=""'>and createtime = #{createTime}</if>
+		<if test='updateTime!=null and updateTime!=""'>and updatetime = #{updateTime}</if>
+	</select>
+
+	<select id="getHiveOrHbaseTableNames" parameterType="string"
+		resultType="string">
+		select
+		a.db_name as dbName,
+		a.table_name as tableName
+		from tb_metadata a
+		where
+		<if test='_parameter=="ALL"'>
+			a.meta_type in ('hive','hbase')
+		</if>
+		<if test='_parameter!="ALL"'>
+			a.meta_type = #{metaDataType,jdbcType=VARCHAR}
+		</if>
+	</select>
+    
+    <select id="getDBHiveTables" parameterType="string"
+		resultType="string">
+		select
+		a.table_name as tableName
+		from tb_metadata a
+		where
+		1=1 and meta_type = 'hive' 
+		<if test="_parameter!=''"> and db_name=#{_parameter,jdbcType=VARCHAR}</if> 
+	</select>
+    
+    <select id="getHiveHDFSMetaData" parameterType="com.hand.bdss.web.entity.MetaDataEntity" resultType="com.hand.bdss.web.entity.MetaDataEntity">
+         select
+		a.id as id,
+		a.meta_name as metaName,
+		a.meta_type as metaType,
+		a.db_name as dbName,
+		a.table_name as tableName,
+		a.meta_hiveFields as metaHiveFields,
+		a.meta_location as metaLocation,
+		a.meta_live as metaLive,
+		a.meta_owner as metaOwner,
+		b.username as userName,
+		a.meta_desc as metaDesc,
+		a.createtime as createTime,
+		a.updatetime as updateTime
+		from tb_metadata a left join tb_user b on a.meta_owner = b.id
+		where
+		1=1
+		and meta_type != 'hdfs'
+		<if test='metaName!=null and metaName!=""'>and meta_name = #{metaName,jdbcType=VARCHAR}</if>
+		<if test='metaType!=null and metaType!=""'>and meta_type = #{metaType,jdbcType=VARCHAR}</if>
+		<if test='dbName!=null and dbName!=""'>and db_name = #{dbName,jdbcType=VARCHAR}</if>
+		<if test='tableName!=null and tableName!=""'>and table_name = #{tableName,jdbcType=VARCHAR}</if>
+		<if test='metaHiveFields!=null and metaHiveFields!=""'>and meta_hiveFields = #{metaHiveFields,jdbcType=VARCHAR}
+		</if>
+		<if test='metaLocation !=null and metaLocation!=""'>and meta_location = #{metaLocation}</if>
+		<if test='metaLive!=null and metaLive!=""'>and meta_live = #{metaLive,jdbcType=INTEGER}</if>
+		<if test='metaOwner!=null and metaOwner!=""'>and meta_owner = #{metaOwner,jdbcType=BIGINT}</if>
+		<if test='metaDesc!=null and metaDesc!=""'>and meta_desc = #{metaDesc,jdbcType=VARCHAR}</if>
+		<if test='createTime!=null and createTime!=""'>and createtime = #{createTime}</if>
+		<if test='updateTime!=null and updateTime!=""'>and updatetime = #{updateTime}</if>
+    </select>
+</mapper>

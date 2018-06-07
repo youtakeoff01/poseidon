@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hand.bdss.web.entity.ApprovalEntity">
+	<select id="getApprovalMsg" parameterType="com.hand.bdss.web.entity.ApplyEntity"
+		resultType="com.hand.bdss.web.entity.ApprovalEntity">
+		select
+		a.id,
+		a.approval_status approvalStatus,
+		a.approval_time as approvalTime
+		from tb_antx_approval a
+		left join tb_antx_apply_approval b on a.id = b.approval_id
+		left join tb_antx_apply c on c.id = b.apply_id
+		where
+		1=1
+		<if test='id!=null'>
+			and c.id = #{id,jdbcType=BIGINT}
+		</if>
+		<if test='approvals[0].id!=null'>
+			and b.approval_id != #{approvals[0].id,jdbcType=BIGINT}
+		</if>
+	</select>
+
+	<update id="updateArrovalStatus" parameterType="com.hand.bdss.web.entity.ApprovalEntity">
+		update tb_antx_approval a set a.approval_status =
+		#{approvalStatus,jdbcType=INTEGER},a.approval_time = #{approvalTime,jdbcType=DATE}
+		where 1=1
+		<if test='id!=null'>
+			and a.id = #{id,jdbcType=BIGINT}
+		</if>
+	</update>
+</mapper>

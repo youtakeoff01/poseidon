@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hand.bdss.web.entity.AIIntermedia">
+	<!-- 获取实验中间表数据 -->
+	<select id="listIntermedias" parameterType="com.hand.bdss.web.entity.AIIntermedia" resultType="com.hand.bdss.web.entity.AIIntermedia">
+		select 
+		user_name as userName,
+		task_name as taskName,
+		table_name as tableName,
+		`comment`
+		from tb_ai_task_intermedias
+		<where>
+			<if test='userName!=null and userName!=""'>
+				and user_name = #{userName,jdbcType=VARCHAR}
+			</if>
+			<if test='taskName!=null and taskName!=""'>
+				and task_name = #{taskName,jdbcType=VARCHAR}
+			</if>
+		</where>
+	</select>
+	
+	<!-- 删除中间表数据  -->
+	<delete id="deleteIntermedia" parameterType="com.hand.bdss.web.entity.AIIntermedia">
+		delete from tb_ai_task_intermedias
+		<where>
+			<if test='userName!=null and userName!=""'>
+				and user_name = #{userName,jdbcType=VARCHAR}
+			</if>
+			<if test='taskName!=null and taskName!=""'>
+				and task_name = #{taskName,jdbcType=VARCHAR}
+			</if>
+		</where>
+	</delete>
+</mapper>

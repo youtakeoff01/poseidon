@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hand.bdss.web.entity.ApplyEntity">
+	<resultMap type="com.hand.bdss.web.entity.ApplyEntity" id="applyEntity">
+		<id property="id" column="id" />
+		<result property="vld" column="vld" />
+		<result property="applyReason" column="applyReason" />
+		<result property="applyStatus" column="applyStatus" />
+		<result property="createDate" column="createDate" />
+		<result property="apperyer.userName" column="userName" />
+		<result property="apperyer.email" column="email" />
+		<result property="apperyer.realName" column="applyRealName" />
+		<collection property="students"
+			ofType="com.hand.bdss.web.entity.StudentEntity">
+			<result property="name" column="stuName" />
+			<result property="sid" column="sid" />
+			<result property="adNumber" column="adNumber" />
+		</collection>
+		<collection property="approvals"
+			ofType="com.hand.bdss.web.entity.ApprovalEntity">
+			<result property="id" column="approId" />
+			<result property="approvaler.userName" column="approvalerUserName" />
+			<result property="approvaler.email" column="approvalerEmail" />
+			<result property="approvalStatus" column="approvalStatus" />
+			<result property="approvalTime" column="approvalTime" />
+		</collection>
+	</resultMap>
+
+
+	<select id="listStudentMsg" parameterType="com.hand.bdss.web.entity.StudentEntity"
+		resultType="com.hand.bdss.web.entity.StudentEntity">
+		select
+		id,
+		IFNULL(chinese_name,english_name) as name,
+		sid,
+		ad_number as
+		adNumber,
+		major,
+		email
+		from
+		tb_antx_students_msg
+		where
+		1=1
+		<if test='name!=null and name!=""'>
+			and (chinese_name like
+			CONCAT('%',#{name,jdbcType=VARCHAR},'%') or english_name like
+			CONCAT('%',#{name,jdbcType=VARCHAR},'%'))
+		</if>
+		<if test='sid!=null and sid!=""'>
+			and sid = #{sid,jdbcType=VARCHAR}
+		</if>
+		<if test='adNumber!=null and adNumber!=""'>
+			and ad_number like
+			CONCAT('%',#{adNumber,jdbcType=VARCHAR},'%')
+		</if>
+	</select>
+
+	<insert id="insertApplyMsg" parameterType="com.hand.bdss.web.entity.ApplyEntity"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into
+		tb_antx_apply(applyer_id,vld,apply_reason,apply_status,create_user,create_time,update_user,update_time)
+		values(
+		#{apperyer.id,jdbcType=BIGINT},
+		#{vld,jdbcType=INTEGER},
+		#{applyReason,jdbcType=VARCHAR},
+		#{applyStatus,jdbcType=INTEGER},
+		#{createUserId,jdbcType=BIGINT},
+		SYSDATE(),
+		#{updateUserId,jdbcType=BIGINT},
+		SYSDATE()
+		)
+	</insert>
+
+	<insert id="insertApplyStuMsg" parameterType="java.util.List">
+		insert into tb_antx_apply_stu(apply_id,stu_id)
+		values
+		<foreach collection="list" item="tuple" separator=",">
+			(
+			#{tuple.value_01,jdbcType=BIGINT},#{tuple.value_02,jdbcType=VARCHAR}
+			)
+		</foreach>
+	</insert>
+
+	<insert id="insertApprovalMsg" parameterType="java.util.List"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into
+		tb_antx_approval(approvaler_id,approval_status,approval_time)
+		values
+		<foreach collection="list" item="approval" separator=",">
+			(
+			#{approval.approvaler.id,jdbcType=BIGINT},#{approval.approvalStatus,jdbcType=BIGINT},#{approval.approvalTime,jdbcType=DATE}
+			)
+		</foreach>
+
+	</insert>
+
+	<insert id="insertApplyApprovalMsg" parameterType="java.util.List">
+		insert into tb_antx_apply_approval(apply_id,approval_id)
+		values
+		<foreach collection="list" item="tuple" separator=",">
+			(
+			#{tuple.value_01,jdbcType=BIGINT},#{tuple.value_02,jdbcType=BIGINT}
+			)
+		</foreach>
+	</insert>
+
+	<select id="listApplyMsg" parameterType="com.hand.bdss.web.entity.ApplyEntity"
+		resultMap="applyEntity">
+		select
+		a.id as id,
+		g.username as userName,
+		g.email as email,
+		g.real_name
+		as applyRealName,
+		a.apply_reason as applyReason,
+		a.vld as vld,
+		a.apply_status as applyStatus,
+		a.create_time as
+		createDate,
+		IFNULL(c.chinese_name,c.english_name) as stuName,
+		c.ad_number as
+		adNumber,
+		c.sid as sid,
+		f.username as approvalerUserName,
+		f.email as
+		approvalerEmail,
+		e.id as approId,
+		e.approval_status as
+		approvalStatus,
+		e.approval_time as
+		approvalTime
+		from tb_antx_apply a
+		LEFT
+		JOIN tb_user g
+		on a.applyer_id =
+		g.id
+		LEFT JOIN tb_antx_apply_stu b on
+		a.id = b.apply_id
+		LEFT JOIN
+		tb_antx_students_msg c on b.stu_id = c.id
+		LEFT JOIN
+		tb_antx_apply_approval d on a.id = d.apply_id
+		LEFT JOIN
+		tb_antx_approval e on e.id = d.approval_id
+		LEFT JOIN tb_user f on f.id
+		= e.approvaler_id
+		where 1=1
+		<if
+			test='apperyer!=null and apperyer.userName!=null and apperyer.userName!=""'>
+			and g.username like
+			CONCAT('%',#{apperyer.userName,jdbcType=VARCHAR},'%')
+		</if>
+		<if test='applyStatus!=null'>
+			and a.apply_status = #{applyStatus,jdbcType=INTEGER}
+		</if>
+		<if test='approvals!=null and approvals[0].approvaler!=null and approvals[0].approvaler.id!=null'>
+			and e.approvaler_id =
+			#{approvals[0].approvaler.id,jdbcType=BIGINT}
+		</if>
+		<if test='approvals!=null and approvals[0].approvalStatus!=null'>
+			and e.approval_status =
+			#{approvals[0].approvalStatus,jdbcType=INTEGER}
+		</if>
+		<if
+			test='students!=null and students[0].name!=null and students[0].name!=""'>
+			and a.id in (select
+			g.id as id
+			from tb_antx_apply g
+			LEFT JOIN
+			tb_antx_apply_stu h on
+			g.id = h.apply_id
+			LEFT JOIN
+			tb_antx_students_msg
+			j on h.stu_id = j.id
+			where j.chinese_name =
+			#{students[0].name,jdbcType=VARCHAR} or
+			j.english_name =
+			#{students[0].name,jdbcType=VARCHAR})
+		</if>
+		<if
+			test='students!=null and students[0].adNumber!=null and students[0].adNumber!=""'>
+			and a.id in (select
+			g.id as id
+			from tb_antx_apply g
+			LEFT JOIN
+			tb_antx_apply_stu h on
+			g.id = h.apply_id
+			LEFT JOIN
+			tb_antx_students_msg
+			j on h.stu_id = j.id
+			where j.ad_number like
+			CONCAT('%',#{students[0].adNumber,jdbcType=VARCHAR},'%'))
+		</if>
+		<if test='students!=null and students[0].sid!=null and students[0].sid!=""'>
+			and a.id in (select
+			g.id as id
+			from tb_antx_apply g
+			LEFT JOIN
+			tb_antx_apply_stu h on
+			g.id = h.apply_id
+			LEFT JOIN
+			tb_antx_students_msg
+			j on h.stu_id = j.id
+			where j.sid =
+			#{students[0].sid,jdbcType=VARCHAR})
+		</if>
+		order by a.create_time DESC
+	</select>
+
+
+
+
+
+
+	<select id="getCountAll" parameterType="com.hand.bdss.web.entity.ApplyEntity"
+		resultType="int">
+		select
+		count(distinct a.id)
+		from tb_antx_apply a
+		LEFT
+		JOIN tb_user g
+		on
+		a.applyer_id =
+		g.id
+		LEFT JOIN tb_antx_apply_stu b on
+		a.id = b.apply_id
+		LEFT JOIN
+		tb_antx_students_msg c on b.stu_id = c.id
+		LEFT JOIN
+		tb_antx_apply_approval d on a.id = d.apply_id
+		LEFT JOIN
+		tb_antx_approval e on e.id = d.approval_id
+		LEFT JOIN tb_user f on f.id
+		= e.approvaler_id
+		where 1=1
+		<if
+			test='apperyer!=null and apperyer.userName!=null and apperyer.userName!=""'>
+			and g.username like
+			CONCAT('%',#{apperyer.userName,jdbcType=VARCHAR},'%')
+		</if>
+		<if test='applyStatus!=null'>
+			and a.apply_status = #{applyStatus,jdbcType=INTEGER}
+		</if>
+		<if test='approvals!=null and approvals[0].approvaler!=null and approvals[0].approvaler.id!=null'>
+			and e.approvaler_id =
+			#{approvals[0].approvaler.id,jdbcType=BIGINT}
+		</if>
+		<if test='approvals!=null and approvals[0].approvalStatus!=null'>
+			and e.approval_status =
+			#{approvals[0].approvalStatus,jdbcType=INTEGER}
+		</if>
+		<if
+			test='students!=null and students[0].name!=null and students[0].name!=""'>
+			and a.id in (select
+			g.id as id
+			from tb_antx_apply g
+			LEFT JOIN
+			tb_antx_apply_stu h on
+			g.id = h.apply_id
+			LEFT JOIN
+			tb_antx_students_msg
+			j on h.stu_id = j.id
+			where j.chinese_name =
+			#{students[0].name,jdbcType=VARCHAR} or
+			j.english_name =
+			#{students[0].name,jdbcType=VARCHAR})
+		</if>
+		<if
+			test='students!=null and students[0].adNumber!=null and students[0].adNumber!=""'>
+			and a.id in (select
+			g.id as id
+			from tb_antx_apply g
+			LEFT JOIN
+			tb_antx_apply_stu h on
+			g.id = h.apply_id
+			LEFT JOIN
+			tb_antx_students_msg
+			j on h.stu_id = j.id
+			where j.ad_number like
+			CONCAT('%',#{students[0].adNumber,jdbcType=VARCHAR},'%'))
+		</if>
+		<if test='students!=null and students[0].sid!=null and students[0].sid!=""'>
+			and a.id in (select
+			g.id as id
+			from tb_antx_apply g
+			LEFT JOIN
+			tb_antx_apply_stu h on
+			g.id = h.apply_id
+			LEFT JOIN
+			tb_antx_students_msg
+			j on h.stu_id = j.id
+			where j.sid =
+			#{students[0].sid,jdbcType=VARCHAR})
+		</if>
+	</select>
+
+
+	<update id="updateApplyStatus" parameterType="com.hand.bdss.web.entity.ApplyEntity">
+		update tb_antx_apply a set a.apply_status =
+		#{applyStatus,jdbcType=INTEGER}
+		where 1=1
+		<if test='id!=null'>
+			and a.id = #{id,jdbcType=BIGINT}
+		</if>
+	</update>
+</mapper>

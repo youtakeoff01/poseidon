@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hand.bdss.web.common.vo.DBSrcVO">
+    <!-- 插入一条数据源信息  -->
+    <insert id="insertDBsrc" parameterType="com.hand.bdss.web.common.vo.DBSrcVO">
+        insert into tb_db_src
+         (src_name,db_name,db_uri,db_user,db_pwd,db_type,db_driver,updatetime,create_account,update_account) 
+        values
+        (#{srcName,jdbcType=VARCHAR},#{dbName,jdbcType=VARCHAR},#{dbUrl},#{dbUser,jdbcType=VARCHAR}
+        ,#{dbPwd,jdbcType=VARCHAR},#{dbType,jdbcType=VARCHAR},#{dbDriver,jdbcType=VARCHAR},SYSDATE(),#{createAccount,jdbcType=INTEGER},#{updateAccount,jdbcType=INTEGER})
+    </insert>
+
+    <select id="listDBSrcs" parameterType="com.hand.bdss.web.common.vo.DBSrcVO"
+            resultType="com.hand.bdss.web.common.vo.DBSrcVO">
+        select
+        id as id,
+        src_name as srcName,
+        db_name as dbName,
+        db_uri as dbUrl,
+        db_user as dbUser,
+        db_pwd as dbPwd,
+        db_type as dbType,
+        db_driver as dbDriver,
+        updatetime as updateTime,
+        create_account as createAccount,
+        update_account as updateAccount
+        from tb_db_src where
+        1=1
+        <if test='id!=null and id!=""'>and id = #{id,jdbcType=INTEGER}</if>
+        <if test='srcName!=null and srcName!=""'>and src_name like CONCAT('%',#{srcName,jdbcType=VARCHAR},'%')</if>
+        <if test='dbName!=null and dbName!=""'>and db_name like CONCAT('%',#{dbName,jdbcType=VARCHAR},'%')</if>
+        <if test='dbUrl!=null and dbUrl!=""'>and db_uri = #{dbUrl}</if>
+        <if test='dbUser!=null and dbUrl!=""'>and db_user = #{dbUser,jdbcType=VARCHAR}</if>
+        <if test='dbPwd!=null and dbPwd!=""'>and db_pwd = #{dbPwd,jdbcType=VARCHAR}</if>
+        <if test='dbType!=null and dbType!=""'>and db_type = #{dbType,jdbcType=VARCHAR}</if>
+        <if test='dbDriver!=null and dbDriver!=""'>and db_driver = #{dbDriver,jdbcType=VARCHAR}</if>
+        <if test='createAccount !=null and createAccount !=""'>and create_account = #{createAccount,jdbcType=INTEGER}</if>
+    </select>
+
+    <select id="getDBSrc" parameterType="com.hand.bdss.web.common.vo.DBSrcVO"
+            resultType="com.hand.bdss.web.common.vo.DBSrcVO">
+        select
+            id as id,
+            src_name as srcName,
+            db_name as dbName,
+            db_uri as dbUrl,
+            db_user as dbUser,
+            db_pwd as dbPwd,
+            db_type as dbType,
+            db_driver as dbDriver,
+            updatetime as updateTime,
+            create_account as createAccount,
+            update_account as updateAccount
+        from tb_db_src
+        <where>
+            <if test='id!=null and id!=""'>
+              id = #{id,jdbcType=INTEGER}
+            </if>
+            <if test='srcName!=null and srcName!=""'>
+              src_name = #{srcName,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+    <select id="getCounts" parameterType="com.hand.bdss.web.common.vo.DBSrcVO" resultType="int">
+        select
+        count(1)
+        from tb_db_src where
+        1=1
+        <if test='srcName!=null and srcName!=""'>and src_name like CONCAT('%',#{srcName,jdbcType=VARCHAR},'%')</if>
+        <if test='dbName!=null and dbName!=""'>and db_name like CONCAT('%',#{dbName,jdbcType=VARCHAR},'%')</if>
+        <if test='dbUrl!=null and dbUrl!=""'>and db_uri = #{dbUrl}</if>
+        <if test='dbUser!=null and dbUrl!=""'>and db_user = #{dbUser,jdbcType=VARCHAR}</if>
+        <if test='dbPwd!=null and dbPwd!=""'>and db_pwd = #{dbPwd,jdbcType=VARCHAR}</if>
+        <if test='dbType!=null and dbType!=""'>and db_type = #{dbType,jdbcType=VARCHAR}</if>
+        <if test='dbDriver!=null and dbDriver!=""'>and db_driver = #{dbDriver,jdbcType=VARCHAR}</if>
+        <if test='createAccount !=null and createAccount !=""'>and create_account = #{createAccount,jdbcType=INTEGER}</if>
+    </select>
+
+    <update id="updateDBSrcsById" parameterType="com.hand.bdss.web.common.vo.DBSrcVO">
+         update tb_db_src a set
+            a.db_name = #{dbName,jdbcType=VARCHAR},
+			a.db_pwd =  #{dbPwd,jdbcType=VARCHAR},
+			a.db_driver = #{dbDriver,jdbcType=VARCHAR},
+			a.db_type  = #{dbType,jdbcType=VARCHAR},
+			a.db_uri = #{dbUrl},
+			a.db_user = #{dbUser,jdbcType=VARCHAR},
+			a.src_name = #{srcName,jdbcType=VARCHAR},
+			a.updatetime = SYSDATE(),
+			a.update_account = #{updateAccount,jdbcType=INTEGER}
+			where a.id = #{id,jdbcType=BIGINT} 
+    </update>
+
+    <delete id="deleteDBSrc" parameterType="list">
+        delete from tb_db_src where id in
+        <foreach collection="list" index="index" item="tag" open="("
+                 separator="," close=")">
+            #{tag,jdbcType=BIGINT}
+        </foreach>
+    </delete>
+
+    <select id="checkSrcName" parameterType="com.hand.bdss.web.common.vo.DBSrcVO" resultType="int">
+       select count(1) from tb_db_src where src_name = #{srcName,jdbcType=VARCHAR}
+    </select>
+</mapper>

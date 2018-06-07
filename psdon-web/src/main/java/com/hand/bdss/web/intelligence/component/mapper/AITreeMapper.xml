@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hand.bdss.web.entity.AITreeEntity">
+	<!-- 查询树列表 <包含节点>-->
+   <select id="listAITree" parameterType="com.hand.bdss.web.entity.AITreeEntity" resultType="com.hand.bdss.web.intelligence.component.vo.AITreeVO">
+   		select 
+          a.id as id,
+          a.com_code as comCode,
+   		  a.com_name as comName,
+   		  a.parent_code as parentCode,
+   		  a.isleaf as isleaf,
+   		  a.descr as descr,
+          concat(CAST(sum(case when b.pipeline like 'in%' then 1 else 0 end) AS CHAR),'-',CAST(sum(case when b.pipeline like 'out%' then 1 else 0 end) AS CHAR)) as in_out
+        from tb_ai_left_com_tree a left join tb_ai_com_inout b on a.com_code = b.com_code
+        where 1=1 and a.parent_code = #{parentCode,jdbcType=VARCHAR}
+   		<if test='comCode!=null and comCode!=""'>and a.com_code = #{comCode,jdbcType=VARCHAR}</if>
+   		<if test='comName!=null and comName!=""'>and a.com_name = #{comName,jdbcType=VARCHAR}</if>
+   		<if test='isleaf!=null and isleaf!=""'>and a.isleaf = #{isleaf,jdbcType=VARCHAR}</if>
+   		group by a.com_code
+   </select> 
+   
+   <!-- 根据条件查询组件 -->
+   <select id="getAITree" parameterType="com.hand.bdss.web.entity.AITreeEntity" resultType="com.hand.bdss.web.entity.AITreeEntity">
+ 		select 
+ 		id as id,
+ 		com_code as comCode,
+ 		com_name as comName,
+ 		parent_code as parentCode,
+ 		isleaf as isleaf,
+ 		descr as descr
+ 		from tb_ai_left_com_tree
+ 		where 1=1
+ 		<if test='comCode!=null and comCode!=""'>and com_code = #{comCode,jdbcType=VARCHAR}</if>
+ 		<if test='comName!=null and comName!=""'>and com_name = #{comName,jdbcType=VARCHAR}</if>
+ 		<if test='isleaf!=null and isleaf!=""'>and isleaf = #{isleaf,jdbcType=VARCHAR}</if>
+  </select>
+</mapper>

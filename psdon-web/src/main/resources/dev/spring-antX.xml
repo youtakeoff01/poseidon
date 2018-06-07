@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+    <!--连接池配置-->
+    <!-- <bean id="sqlServerDataSource" class="com.alibaba.druid.pool.DruidDataSource"
+          init-method="init" destroy-method="close">
+        <property name="driverClassName" value="${sqlServerJdbc.driverClassName}"/>
+        <property name="url" value="${sqlServerJdbc.url}"/>
+        <property name="username" value="${sqlServerJdbc.username}"/>
+        <property name="password" value="${sqlServerJdbc.password}"/>
+        <property name="maxActive" value="${sqlServerJdbc.maxActive}"/>
+        <property name="initialSize" value="${sqlServerJdbc.initialSize}"/>
+        <property name="maxWait" value="${sqlServerJdbc.maxWait}"/>
+        <property name="minIdle" value="${sqlServerJdbc.minIdle}"/>
+        <property name="testWhileIdle" value="${sqlServerJdbc.testWhileIdle}"/>
+        <property name="testOnBorrow" value="${sqlServerJdbc.testOnBorrow}"/>
+        <property name="validationQuery" value="${sqlServerJdbc.validationQuery}"/>
+        <property name="poolPreparedStatements" value="${sqlServerJdbc.poolPreparedStatements}"/>
+        <property name="maxOpenPreparedStatements" value="${sqlServerJdbc.maxOpenPreparedStatements}"/>
+    </bean>
+    <bean id="sqlServerCRUDUtils" class="com.hand.bdss.web.common.util.SqlServerCRUDUtils">
+         <property name="dataSource" ref="sqlServerDataSource"/>
+    </bean> -->
+</beans>

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hand.bdss.web.entity.RangerEntity">
+   
+   <select id="getUser" parameterType="com.hand.bdss.web.entity.RangerEntity" resultType="com.hand.bdss.web.entity.RangerEntity">
+       select 
+			a.id as id,
+			a.strategy_name as name,
+			a.service_name as serviceName,
+			a.users as user,
+			a.ranger_databases as rangerDatabases,
+			a.ranger_tables as rangerTables,
+			a.ranger_columns as rangerColumns,
+			a.types as type,
+			a.role as role,
+			a.create_time as createTime,
+			a.update_time as updateTime
+			from tb_ranger a 
+		where 
+		1=1 and a.users=#{user,jdbcType=VARCHAR}
+    </select>
+    
+     <select id="checkUser" parameterType="com.hand.bdss.web.entity.RangerEntity" resultType="int">
+       select count(1) from tb_ranger where users=#{user,jdbcType=VARCHAR}
+    </select>
+   
+    <insert id="insertRanger" parameterType="com.hand.bdss.web.entity.RangerEntity">
+      insert into tb_ranger(strategy_name,service_name,users,ranger_databases,ranger_tables,ranger_columns,role,types,create_time)
+      values(#{name,jdbcType=VARCHAR},#{serviceName,jdbcType=VARCHAR},
+      #{user,jdbcType=VARCHAR},#{rangerDatabases,jdbcType=VARCHAR},#{rangerTables,jdbcType=VARCHAR},
+      #{rangerColumns,jdbcType=VARCHAR},#{role,jdbcType=VARCHAR},#{type,jdbcType=VARCHAR},SYSDATE())
+    </insert>
+    
+    <update id="updateRangerByName" parameterType="com.hand.bdss.web.entity.RangerEntity">
+        update tb_ranger set 
+			service_name = #{serviceName,jdbcType=VARCHAR},
+			users = #{user,jdbcType=VARCHAR},
+			ranger_databases = #{rangerDatabases,jdbcType=VARCHAR},
+			ranger_tables = #{rangerTables,jdbcType=VARCHAR},
+			ranger_columns = #{rangerColumns,jdbcType=VARCHAR},
+			role = #{role,jdbcType=VARCHAR},
+			types = #{type,jdbcType=VARCHAR},
+			update_time = SYSDATE()
+         where strategy_name = #{name,jdbcType=VARCHAR} 
+    </update>
+    
+    <select id="listHivePolicy" parameterType="com.hand.bdss.web.entity.RangerEntity" resultType="com.hand.bdss.web.entity.RangerEntity">
+          select 
+			a.id as id,
+			a.strategy_name as name,
+			a.service_name as serviceName,
+			a.users as user,
+			a.ranger_databases as rangerDatabases,
+			a.ranger_tables as rangerTables,
+			a.ranger_columns as rangerColumns,
+			a.types as type,
+			a.role as role,
+			a.create_time as createTime,
+			a.update_time as updateTime
+			from tb_ranger a 
+		where 
+		1=1
+		<if test='name!=null and name!=""'>
+		    and a.strategy_name = #{name,jdbcType=VARCHAR}
+		</if>
+		
+		<if test='serviceName!=null and serviceName!=""'>
+		    and a.service_name = #{serviceName,jdbcType=VARCHAR}
+		</if>
+		<if test='user!=null and user!=""'>
+		    and a.users like CONCAT('%',#{user,jdbcType=VARCHAR},'%')
+		</if>
+		<if test='rangerDatabases !=null and rangerDatabases !=""'>
+		    and a.ranger_databases = #{rangerDatabases,jdbcType=VARCHAR}
+		</if>
+		<if test='rangerTables !=null and rangerTables !=""'>
+		    and a.ranger_tables = #{rangerTables,jdbcType=VARCHAR}
+		</if>
+		<if test='rangerColumns !=null and rangerColumns !=""'>
+		    and a.ranger_columns = #{rangerColumns,jdbcType=VARCHAR}
+		</if>
+		<if test='type !=null and type !=""'>
+		    and a.types = #{type,jdbcType=VARCHAR}
+		</if>
+		<if test='role !=null and role !=""'>
+		    and a.role = #{role,jdbcType=VARCHAR}
+		</if>
+    </select>
+    
+    <delete id="deleteRangerByName" parameterType="list">
+         delete from tb_ranger  where  
+         strategy_name in
+         <foreach collection="list" index="index" item="tag" open="("
+           separator="," close=")">
+           #{tag.name,jdbcType=VARCHAR}
+         </foreach>
+    </delete>
+    
+    <select id="getCounts" parameterType="com.hand.bdss.web.entity.RangerEntity" resultType="int">
+    	select count(1) from tb_ranger a
+    	where 
+    	1=1 
+		<if test='name!=null and name!=""'>
+		    and a.strategy_name = #{name,jdbcType=VARCHAR}
+		</if>
+		
+		<if test='serviceName!=null and serviceName!=""'>
+		    and a.service_name = #{serviceName,jdbcType=VARCHAR}
+		</if>
+		<if test='user!=null and user!=""'>
+		    and a.users like CONCAT('%',#{user,jdbcType=VARCHAR},'%')
+		</if>
+		<if test='rangerDatabases !=null and rangerDatabases !=""'>
+		    and a.ranger_databases = #{rangerDatabases,jdbcType=VARCHAR}
+		</if>
+		<if test='rangerTables !=null and rangerTables !=""'>
+		    and a.ranger_tables = #{rangerTables,jdbcType=VARCHAR}
+		</if>
+		<if test='rangerColumns !=null and rangerColumns !=""'>
+		    and a.ranger_columns = #{rangerColumns,jdbcType=VARCHAR}
+		</if>
+		<if test='type !=null and type !=""'>
+		    and a.types = #{type,jdbcType=VARCHAR}
+		</if>
+		<if test='role !=null and role !=""'>
+		    and a.role = #{role,jdbcType=VARCHAR}
+		</if>
+    </select>
+    <select id="getSelectedTables" parameterType="java.lang.Integer" resultType="com.hand.bdss.web.entity.RangerEntity">
+    	select a.id as id,
+			a.strategy_name as name,
+			a.service_name as serviceName,
+			a.users as user,
+			a.ranger_databases as rangerDatabases,
+			a.ranger_tables as rangerTables,
+			a.ranger_columns as rangerColumns,
+			a.types as type,
+			a.role as role,
+			a.create_time as createTime,
+			a.update_time as updateTime
+			from tb_ranger a 
+    	where
+    		id = #{id}
+    </select>
+</mapper>

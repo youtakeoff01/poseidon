@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hand.bdss.web.entity.LatestTaskEntity">
+	<insert id="insertLatestTask" parameterType="com.hand.bdss.web.entity.LatestTaskEntity">
+		insert into
+		tb_latest_task (
+		task_name,task_type,task_attr_id,create_user,create_time,update_user,update_time
+		)
+		values
+		(#{taskName,jdbcType=VARCHAR},#{taskType,jdbcType=VARCHAR},#{taskAttrId,jdbcType=BIGINT},
+		#{createUser,jdbcType=VARCHAR},SYSDATE(),#{createUser,jdbcType=VARCHAR},SYSDATE())
+	</insert>
+
+	<update id="updateLatestTask" parameterType="com.hand.bdss.web.entity.LatestTaskEntity">
+		update tb_latest_task a set
+		a.update_user =
+		#{updateUser,jdbcType=VARCHAR},
+		a.update_time = SYSDATE()
+		where
+		1=1
+		<if test=' id !=null and id !=""'>and task_attr_id = #{taskAttrId,jdbcType=BIGINT}</if>
+	</update>
+
+	<update id="updateLatestTaskById" parameterType="com.hand.bdss.web.entity.LatestTaskEntity">
+		update tb_latest_task a set
+		a.update_user =
+		#{updateUser,jdbcType=VARCHAR},
+		a.email_str = #{emailStr,jdbcType=VARCHAR},
+		a.timer_attribute = #{timerAttribute,jdbcType=VARCHAR},
+		a.notification_id = #{notificationId,jdbcType=VARCHAR},
+		a.update_time = SYSDATE()
+		where
+		1=1
+		<if test=' id !=null and id !=""'>and id = #{id,jdbcType=VARCHAR}</if>
+	</update>
+
+	<delete id="deleteLatestTask" parameterType="list">
+		delete from tb_latest_task where
+		id in
+		<foreach collection="list" index="index" item="tag" open="("
+			separator="," close=")">
+			#{tag.id,jdbcType=BIGINT}
+		</foreach>
+	</delete>
+
+
+
+	<select id="listLatestTaskEntity" parameterType="com.hand.bdss.web.entity.LatestTaskEntity"
+		resultType="com.hand.bdss.web.entity.LatestTaskEntity">
+		select
+		a.id as id,
+		a.task_name as taskName,
+		a.task_type as taskType,
+		a.task_attr_id as taskAttrId,
+		a.create_user as createUser,
+		a.create_time as createTime,
+		a.update_user as updateUser,
+		a.update_time
+		as updateTime
+		from tb_latest_task a
+		where
+		1=1
+		<if test='taskName !=null and taskName !=""'>and task_name like
+			CONCAT('%',#{taskName,jdbcType=VARCHAR},'%')</if>
+		<if test=' taskType !=null and taskType !=""'>and task_type = #{taskType,jdbcType=VARCHAR}</if>
+		<if test=' taskAttrId !=null and taskAttrId !=""'>and task_attr_id = #{taskAttrId,jdbcType=BIGINT}</if>
+		<if test=' createUser !=null and createUser !=""'>and create_user = #{createUser,jdbcType=VARCHAR}</if>
+		<if test=' createTime !=null and createTime !=""'>and create_time = #{createTime,jdbcType=VARCHAR}</if>
+		<if test=' updateUser !=null and updateUser !=""'>and update_user = #{updateUser,jdbcType=VARCHAR}</if>
+		<if test=' updateTime !=null and updateTime !=""'>and update_time = #{updateTime,jdbcType=VARCHAR}</if>
+		ORDER BY create_time DESC
+	</select>
+
+	<select id="listJarTasks" parameterType="com.hand.bdss.web.entity.LatestTaskEntity"
+		resultType="com.hand.bdss.web.common.vo.ShowTaskJarInfoVO">
+		select
+		a.id as id,
+		a.task_name as taskName,
+		a.task_type as taskType,
+		a.create_time as createTime,
+		a.create_user as createUser,
+		a.update_time
+		as updateTime,
+		a.update_user as updateUser,
+		a.task_attr_id as
+		taskAttrId,
+		a.timer_attribute as timerAttribute,
+		b.entry_class as entryClass,
+		b.system_param as systemParam,
+		b.user_param as userParam,
+		c.jar_name as jarName,
+		c.jar_path as jarPath,
+		d.rule_name as ruleName
+		from tb_latest_task a
+		left join tb_task_attribute b on a.task_attr_id=b.id
+		left join tb_jar_info c on b.jar_info_id=c.id
+		LEFT JOIN tb_mail_notice_rule d on a.notification_id=d.id
+		where
+		1=1
+		<if test='taskName !=null and taskName !=""'>and a.task_name like
+			CONCAT('%',#{taskName,jdbcType=VARCHAR},'%')</if>
+		<if test='taskType !=null and taskType !=""'>and a.task_type = #{taskType,jdbcType=VARCHAR}</if>
+		<if test='createUser!=null and createUser!=""'>and a.create_user = #{createUser,jdbcType=VARCHAR}</if>
+	</select>
+	
+	<select id="listJarTaskCounts" parameterType="com.hand.bdss.web.entity.LatestTaskEntity"
+		resultType="int">
+		select
+		count(1)
+		from tb_latest_task a
+		where
+		1=1
+		<if test='taskName !=null and taskName !=""'>and a.task_name like
+			CONCAT('%',#{taskName,jdbcType=VARCHAR},'%')</if>
+		<if test='taskType !=null and taskType !=""'>and a.task_type = #{taskType,jdbcType=VARCHAR}</if>
+		<if test='createUser!=null and createUser!=""'>and a.create_user = #{createUser,jdbcType=VARCHAR}</if>
+	</select>
+
+	<select id="checkJarTaskName" parameterType="com.hand.bdss.web.entity.LatestTaskEntity"
+		resultType="int">
+		select count(1) from tb_latest_task a
+		where 1=1
+		<if test='taskName !=null and taskName !=""'>and a.task_name = #{taskName,jdbcType=VARCHAR}</if>
+		<if test='taskType !=null and taskType !=""'>and a.task_type = #{taskType,jdbcType=VARCHAR}</if>
+	</select>
+</mapper>

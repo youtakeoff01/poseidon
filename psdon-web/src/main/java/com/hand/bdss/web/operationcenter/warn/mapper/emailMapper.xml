@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hand.bdss.web.entity.EmailEntity">
+	<insert id="insertEmail" parameterType="com.hand.bdss.web.entity.EmailEntity">
+        insert into tb_email
+         (channel_name,channel_type,receive_acount,send_server,port,send_account,email_password,booean_ssl,create_time) 
+        values
+        (#{channelName,jdbcType=VARCHAR},#{channelType,jdbcType=VARCHAR},#{receiveAcount,jdbcType=VARCHAR},
+        #{sendServer,jdbcType=VARCHAR},#{port,jdbcType=VARCHAR},#{sendAccount,jdbcType=VARCHAR},#{emailPassword,jdbcType=VARCHAR},
+        #{booean_ssl,jdbcType=VARCHAR},SYSDATE())
+    </insert>
+    
+    <select id="listConditions" parameterType="com.hand.bdss.web.entity.EmailEntity" resultType="com.hand.bdss.web.entity.EmailEntity">
+       select
+       a.id as id,
+       a.channel_name as channelName,
+       a.channel_type as channelType,
+       a.receive_acount as receiveAcount,
+       a.send_server as sendServer,
+       a.port as port,
+       a.send_account as sendAccount,
+       a.email_password as emailPassword,
+       a.booean_ssl as booean_ssl,
+       a.create_time as createTime,
+       a.update_time as updateTime
+       from tb_email a
+       where
+       1=1   
+        <if test='id!=null and id!=""'>and id = #{id,jdbcType=BIGINT}</if>  
+		<if test='channelName!=null and channelName!=""'>and channel_name like CONCAT('%',#{channelName,jdbcType=VARCHAR},'%')</if>
+		<if test='channelType!=null and channelType!=""'>and channel_type = #{channelType,jdbcType=VARCHAR}</if>
+		<if test='receiveAcount!=null and receiveAcount!=""'>and receive_acount = #{receiveAcount,jdbcType=VARCHAR}</if>
+		<if test='sendServer!=null and sendServer!=""'>and send_server = #{sendServer,jdbcType=VARCHAR}</if>
+		<if test='port!=null and port!=""'>and port = #{port,jdbcType=VARCHAR}</if>
+		<if test='sendAccount!=null and sendAccount!=""'>and send_account = #{sendAccount,jdbcType=VARCHAR}</if>
+		<if test='emailPassword!=null and emailPassword!=""'>and email_password = #{emailPassword,jdbcType=VARCHAR}</if>
+		<if test='booean_ssl!=null and booean_ssl!=""'>and booean_ssl = #{booean_ssl,jdbcType=VARCHAR}</if>
+    </select>
+    
+    <select id="listConditionCountAll" parameterType="com.hand.bdss.web.entity.EmailEntity" resultType="int">
+       select
+       count(1)
+       from tb_email 
+       where
+       1=1   
+        <if test='id!=null and id!=""'>and id = #{id,jdbcType=BIGINT}</if>
+		<if test='channelName!=null and channelName!=""'>and channel_name like CONCAT('%',#{channelName,jdbcType=VARCHAR},'%')</if>
+		<if test='channelType!=null and channelType!=""'>and channel_type = #{channelType,jdbcType=VARCHAR}</if>
+		<if test='receiveAcount!=null and receiveAcount!=""'>and receive_acount = #{receiveAcount,jdbcType=VARCHAR}</if>
+		<if test='sendServer!=null and sendServer!=""'>and send_server = #{sendServer,jdbcType=VARCHAR}</if>
+		<if test='port!=null and port!=""'>and port = #{port,jdbcType=VARCHAR}</if>
+		<if test='sendAccount!=null and sendAccount!=""'>and send_account = #{sendAccount,jdbcType=VARCHAR}</if>
+		<if test='emailPassword!=null and emailPassword!=""'>and email_password = #{emailPassword,jdbcType=VARCHAR}</if>
+		<if test='booean_ssl!=null and booean_ssl!=""'>and booean_ssl = #{booean_ssl,jdbcType=VARCHAR}</if>
+    </select>
+    
+    <select id="listEmailsAll" parameterType="com.hand.bdss.web.entity.EmailEntity" resultType="com.hand.bdss.web.entity.EmailEntity">
+       select
+       a.id as id,
+       a.channel_name as channelName,
+       a.channel_type as channelType,
+       a.receive_acount as receiveAcount,
+       a.send_server as sendServer,
+       a.port as port,
+       a.send_account as sendAccount,
+       a.email_password as emailPassword,
+       a.booean_ssl as booean_ssl,
+       a.create_time as createTime,
+       a.update_time as updateTime
+       from tb_email a
+       where
+       1=1   
+        <if test='id!=null and id!=""'>and id = #{id,jdbcType=BIGINT}</if>
+		<if test='channelName!=null and channelName!=""'>and channel_name = #{channelName,jdbcType=VARCHAR}</if>
+		<if test='channelType!=null and channelType!=""'>and channel_type = #{channelType,jdbcType=VARCHAR}</if>
+		<if test='receiveAcount!=null and receiveAcount!=""'>and receive_acount = #{receiveAcount,jdbcType=VARCHAR}</if>
+		<if test='sendServer!=null and sendServer!=""'>and send_server = #{sendServer,jdbcType=VARCHAR}</if>
+		<if test='port!=null and port!=""'>and port = #{port,jdbcType=VARCHAR}</if>
+		<if test='sendAccount!=null and sendAccount!=""'>and send_account = #{sendAccount,jdbcType=VARCHAR}</if>
+		<if test='emailPassword!=null and emailPassword!=""'>and email_password = #{emailPassword,jdbcType=VARCHAR}</if>
+		<if test='booean_ssl!=null and booean_ssl!=""'>and booean_ssl = #{booean_ssl,jdbcType=VARCHAR}</if>
+    </select>
+    
+    
+    
+      
+    <update id="updateEmail" parameterType="com.hand.bdss.web.entity.EmailEntity">
+       update tb_email a set
+       a.id = #{id,jdbcType=INTEGER},
+       a.channel_name = #{channelName,jdbcType=VARCHAR},
+       a.channel_type = #{channelType,jdbcType=VARCHAR},
+       a.receive_acount = #{receiveAcount,jdbcType=VARCHAR},
+       a.send_server = #{sendServer,jdbcType=VARCHAR},
+       a.port = #{port,jdbcType=VARCHAR},
+       a.send_account = #{sendAccount,jdbcType=VARCHAR},
+       a.email_password = #{emailPassword,jdbcType=VARCHAR},
+       a.booean_ssl = #{booean_ssl,jdbcType=VARCHAR},
+       a.update_time = SYSDATE()       
+       where
+       1=1
+		<if test='id!=null and id!=""'>and id = #{id,jdbcType=INTEGER}</if>
+    </update>
+    
+    <delete id="deleteEmail" parameterType="list">
+		delete from tb_email where
+		id in
+		<foreach collection="list" index="index" item="tag" open="("
+			separator="," close=")">
+			#{tag.id,jdbcType=BIGINT}
+		</foreach>
+	</delete>
+    
+</mapper>

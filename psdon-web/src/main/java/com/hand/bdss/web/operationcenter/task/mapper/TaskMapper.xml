@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hand.bdss.web.entity.TaskEntity">
+
+    <insert id="insert" parameterType="com.hand.bdss.dev.vo.Task">
+        insert into tb_task(
+         account,
+         task_name,
+         dependencies,
+         sql_stc,
+         sql_type,
+         task_type,
+         source_db,
+         source_table,
+         target_db,
+         target_table,
+         field_mapping,
+         filter_condition,
+        `action`,
+         timer_attribute,
+         notification_id,
+         createtime,
+         updatetime,
+         starttime,
+         endtime,
+         `partition`,
+         partition_type,
+         `status`,
+         remarks,
+         script,
+         data_type,
+         num
+         )
+        values(
+        #{account,jdbcType=BIGINT},
+        #{taskName,jdbcType=VARCHAR},
+        #{dependencies,jdbcType=VARCHAR},
+        #{sqlStc,jdbcType=LONGVARCHAR},
+        #{sqlType,jdbcType=VARCHAR},
+        #{taskType,jdbcType=VARCHAR},
+        #{sourceDb,jdbcType=VARCHAR},
+        #{sourceTable,jdbcType=VARCHAR},
+        #{targetDB,jdbcType=VARCHAR},
+        #{targetTable,jdbcType=VARCHAR},
+        #{fieldMapping,jdbcType=LONGVARCHAR},
+        #{filterCondition,jdbcType=VARCHAR},
+        #{action,jdbcType=VARCHAR},
+        #{timerAttribute,jdbcType=VARCHAR},
+        #{notificationId,jdbcType=BIGINT},
+        SYSDATE(),
+        #{updatetime},
+        #{starttime},
+        #{endtime},
+        #{partition,jdbcType=VARCHAR},
+        #{partitionType,jdbcType=VARCHAR},
+        #{status},
+        #{remarks},
+        #{script,jdbcType=LONGVARCHAR},
+        #{dataType,jdbcType=VARCHAR},
+        #{num,jdbcType=INTEGER}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.hand.bdss.dev.vo.Task">
+        update tb_task
+        <set>
+            <if test="timerAttribute != null">
+                timer_attribute = #{timerAttribute,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                `status` = #{status},
+            </if>
+            <if test="script != null">
+            	script = #{script},
+            </if>
+            <if test='num!=null and num!=""'>
+                 num = #{num,jdbcType=INTEGER},
+            </if>
+            notification_id = #{notificationId},
+            starttime = #{starttime},
+            endtime = #{endtime},
+            updatetime = SYSDATE()
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <delete id="deletes" parameterType="list">
+        delete from tb_task where id in
+        <foreach collection="list" index="index" item="tag" open="("
+                 separator="," close=")">
+            #{tag,jdbcType=BIGINT}
+        </foreach>
+    </delete>
+    <delete id="delete" parameterType="java.lang.Long">
+        delete from tb_task
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+
+    <select id="select" resultType="com.hand.bdss.dev.vo.Task" parameterType="java.lang.Long">
+       select
+          t.id,
+          t.account,
+          t.task_name as taskName,
+          t.dependencies,
+          t.sql_stc as sqlStc,
+          t.sql_type as sqlType,
+          t.task_type as taskType,
+          t.target_db as targetDB,
+          t.target_table as targetTable,
+          t.field_mapping as fieldMapping,
+          t.`action`,
+          t.timer_attribute as timerAttribute,
+          t.notification_id,
+          t.createtime,
+          t.updatetime,
+          t.starttime,
+          t.endtime,
+          t.`partition`,
+          t.partition_type as partitionType,
+          t.script,
+          t.`status`,
+          t.data_type as dataType,
+          t.num as num,
+          u.username as createAccount
+       from tb_task t
+       left join tb_user u on t.account = u.id
+       where t.id = #{id,jdbcType=BIGINT}
+    </select>
+    <select id="getTaskScheduleInfo" resultType="com.hand.bdss.dev.vo.TaskScheduleInfo" parameterType="java.lang.Long">
+        select
+        t.id,
+        t.account,
+        t.task_name as taskName,
+        t.dependencies,
+        t.sql_stc as sqlStc,
+        t.sql_type as sqlType,
+        t.task_type as taskType,
+        t.target_db as targetDB,
+        t.target_table as targetTable,
+        t.field_mapping as fieldMapping,
+        t.`action`,
+        t.timer_attribute as timerAttribute,
+        t.notification_id as notificationId,
+        t.createtime,
+        t.updatetime,
+        t.starttime,
+        t.endtime,
+        t.`partition`,
+        t.`status`,
+        t.data_type as dataType
+        from tb_task t
+        where t.id = #{id,jdbcType=BIGINT}
+    </select>
+    <select id="selectScrpList" resultType="com.hand.bdss.dev.vo.Task" parameterType="com.hand.bdss.dev.vo.Task">
+        select
+        t.id,
+        t.account as account,
+        t.task_name as taskName,
+        dependencies,
+        t.task_type as taskType,
+        t.sql_type as sqlType,
+        t.createtime,
+        t.starttime,
+        t.endtime,
+        t.`status`,
+        t.`partition`,
+        t.sql_stc as sqlStc,
+        t.timer_attribute as timerAttribute,
+        t.notification_id as notificationId,
+        t.num as num,
+        n.rule_name as ruleName,
+        u.username as createAccount
+        from tb_task t
+        left join tb_notification n on t.notification_id = n.id
+        left join tb_user u on t.account = u.id
+        <where>
+            <if test="taskName!=null and taskName!=''">
+                and t.task_name like CONCAT('%',#{taskName},'%')
+            </if>
+            <if test="taskType!=null">
+                and t.task_type = #{taskType}
+            </if>
+             <if test="account !=null ">
+                and t.account = #{account}
+            </if>
+        </where>
+        order by t.id desc
+    </select>
+    <select id="selects" resultType="com.hand.bdss.dev.vo.Task" parameterType="com.hand.bdss.dev.vo.Task">
+        select
+        t.id,
+        t.task_name as taskName,
+        t.dependencies,
+        t.script,
+        t.task_type as taskType,
+        u.username as createAccount
+        from tb_task t
+        LEFT JOIN tb_user u on t.account = u.id
+        <where>
+            <if test="taskType!=null">
+                and t.task_type = #{taskType}
+            </if>
+            <if test="taskName!=null and taskName!=''">
+                and t.task_name = #{taskName}
+            </if>
+        </where>
+        order by t.id desc
+    </select>
+    <select id="selectSyncList" resultType="com.hand.bdss.dev.vo.Task" parameterType="com.hand.bdss.dev.vo.Task">
+        select
+        t.id,
+        t.account as account,
+        t.task_name as taskName,
+        t.task_type as taskType,
+        "sqoop" as sqlType,
+        t.source_db as sourceDb,
+        t.source_table as sourceTable,
+        t.target_db as targetDB,
+        t.target_table as targetTable,
+        t.createtime,
+        t.starttime,
+        t.endtime,
+        t.timer_attribute as timerAttribute,
+        t.notification_id as notificationId,
+        n.rule_name as ruleName,
+        t.`status`,
+        t.`partition`,
+        t.num as num,
+        u.username as createAccount
+        from tb_task t
+        left join tb_notification n on t.notification_id = n.id
+        LEFT JOIN tb_user u on t.account = u.id
+        <where>
+            <if test="taskName!=null and taskName!=''">
+                and t.task_name like CONCAT('%',#{taskName},'%')
+            </if>
+            <if test="taskType!=null">
+                and t.task_type = #{taskType}
+            </if>
+             <if test="account !=null ">
+                and t.account = #{account}
+            </if>
+        </where>
+        order by t.id desc
+    </select>
+    <select id="selectAIList" resultType="com.hand.bdss.web.operationcenter.task.vo.AITaskInfo" parameterType="com.hand.bdss.dev.vo.Task">
+        SELECT
+        t.id,
+        t.account as account,
+        t.task_name as taskName,
+        t.task_type as taskType,
+        t.createtime,
+        t.`status`,
+        t.timer_attribute as timerAttribute,
+        u.username as createAccount
+        FROM tb_task t
+        left join tb_notification n on t.notification_id = n.id
+        left join tb_user u on t.account = u.id
+        <where>
+            <if test="taskName!=null and taskName!=''">
+                and t.task_name like CONCAT('%',#{taskName},'%')
+            </if>
+            <if test="taskType!=null">
+                and t.task_type = #{taskType}
+            </if>
+             <if test="account !=null ">
+                and t.account = #{account}
+            </if>
+        </where>
+        order by t.id desc
+    </select>
+    <select id="selectCount" resultType="java.lang.Integer" parameterType="com.hand.bdss.dev.vo.Task">
+        select
+        count(1)
+        from tb_task
+        <where>
+            <if test="taskName!=null and taskName!=''">
+                and task_name like CONCAT('%',#{taskName},'%')
+            </if>
+            <if test="taskType!=null">
+                and task_type = #{taskType}
+            </if>
+        </where>
+    </select>
+
+    <select id="check" resultType="java.lang.Integer" parameterType="com.hand.bdss.dev.vo.Task">
+        select
+        count(1)
+        from tb_task
+        <where>
+            <if test="taskName!=null and taskName!=''">
+                and task_name = #{taskName}
+            </if>
+        </where>
+        order by id
+    </select>
+</mapper>

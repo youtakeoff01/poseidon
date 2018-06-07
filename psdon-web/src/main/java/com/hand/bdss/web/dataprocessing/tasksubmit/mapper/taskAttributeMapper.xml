@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hand.bdss.web.entity.TaskAttributeEntity">
+	<insert id="insertTaskAttribute" parameterType="com.hand.bdss.web.entity.TaskAttributeEntity"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into tb_task_attribute (
+		jar_info_id,entry_class,system_param,user_param,create_user,create_time,update_user,update_time
+		)values(#{jarInfoId,jdbcType=BIGINT},#{entryClass,jdbcType=VARCHAR},#{systemParam,jdbcType=VARCHAR},#{userParam,jdbcType=VARCHAR},#{createUser,jdbcType=VARCHAR},SYSDATE(),#{createUser,jdbcType=VARCHAR},SYSDATE())
+	</insert>
+
+	<select id="listTaskAttribute" parameterType="com.hand.bdss.web.entity.TaskAttributeEntity"
+		resultType="com.hand.bdss.web.entity.TaskAttributeEntity">
+		select
+		id as id,
+		jar_info_id as jarInfoId,
+		entry_class as entryClass,
+		system_param as systemParam,
+		user_param as userParam,
+		create_user as createUser,
+		create_time as createTime,
+		update_user as updateUser,
+		update_time as updateTime
+		from tb_task_attribute a
+		where
+		1=1
+		<if test='id!=null and id!=""'>and id = #{id,jdbcType=BIGINT}</if>
+		<if test='entryClass!=null and entryClass!=""'>and entry_class = #{entryClass,jdbcType=VARCHAR}</if>
+		<if test='systemParam!=null and systemParam!=""'>and system_param = #{systemParam,jdbcType=VARCHAR}</if>
+		<if test='userParam!=null and userParam!=""'>and user_param = #{userParam,jdbcType=VARCHAR}</if>
+	</select>
+
+	<delete id="deleteTaskAttribute" parameterType="list">
+		delete from tb_task_attribute where
+		id in
+		<foreach collection="list" index="index" item="tag" open="("
+			separator="," close=")">
+			#{tag.id,jdbcType=BIGINT}
+		</foreach>
+	</delete>
+	<update id="updateTaskAttribute" parameterType="com.hand.bdss.web.entity.TaskAttributeEntity">
+		UPDATE tb_task_attribute a SET
+		a.entry_class = #{entryClass,jdbcType=VARCHAR},
+		a.system_param = #{systemParam,jdbcType=VARCHAR},
+		a.user_param = #{userParam,jdbcType=VARCHAR},
+		a.update_user = #{updateUser,jdbcType=VARCHAR},
+		a.update_time = SYSDATE()
+		where
+		1=1
+		<if test=' id !=null and id !=""'>and id = #{id,jdbcType=BIGINT}</if>
+	</update>
+	<select id="listTasks" parameterType="com.hand.bdss.web.entity.JarInfoEntity" resultType="int">
+		select
+		COUNT(1)
+		from tb_task_attribute a
+		where
+		1=1
+		<if test='id!=null and id!=""'>and a.jar_info_id = #{id,jdbcType=BIGINT}</if>
+	</select>
+</mapper>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hand.bdss.web.entity.NoticeRuleEntity">
+	<insert id="insertNoticeRule" parameterType="com.hand.bdss.web.entity.NoticeRuleEntity">
+        insert into tb_mail_notice_rule
+         (mail_channel_id,rule_name,trigger_rule,trigger_condition,rule_num,notice_content,create_time) 
+        values
+        (#{mailChannelId,jdbcType=INTEGER},#{ruleName,jdbcType=VARCHAR},#{triggerRule,jdbcType=VARCHAR},
+        #{triggerCondition,jdbcType=VARCHAR},#{ruleNum,jdbcType=VARCHAR},#{noticeContent,jdbcType=VARCHAR},SYSDATE())
+    </insert>
+    
+    <select id="listNoticeRules" parameterType="com.hand.bdss.web.entity.NoticeRuleEntity" resultType="com.hand.bdss.web.entity.NoticeRuleEntity">
+       select
+       a.id as id,
+       a.mail_channel_id as mailChannelId,
+       b.channel_name as mailChannelName,
+       a.rule_name as ruleName,
+       a.trigger_rule as triggerRule,
+       a.trigger_condition as triggerCondition,
+       if(a.trigger_rule = '数据使用率',concat(a.rule_num*100,'%'),if(a.trigger_rule = '集群状态',a.rule_num,'null')) as ruleNum,
+       a.notice_content as noticeContent,
+       a.create_time as createTime
+       from tb_mail_notice_rule a left join tb_email b
+       on a.mail_channel_id = b.id
+       where
+       1=1   
+		<if test='mailChannelId!=null and mailChannelId!=""'>and mail_channel_id = #{mailChannelId,jdbcType=INTEGER}</if>
+		<if test='ruleName!=null and ruleName!=""'>and rule_name like CONCAT('%',#{ruleName,jdbcType=VARCHAR},'%')</if>
+		<if test='triggerRule!=null and triggerRule!=""'>and trigger_rule = #{triggerRule,jdbcType=VARCHAR}</if>
+		<if test='triggerCondition!=null and triggerCondition!=""'>and trigger_condition = #{triggerCondition,jdbcType=VARCHAR}</if>
+		<if test='ruleNum!=null and ruleNum!=""'>and rule_num = #{ruleNum,jdbcType=VARCHAR}</if>
+		<if test='noticeContent!=null and noticeContent!=""'>and notice_content = #{noticeContent,jdbcType=VARCHAR}</if>
+		<if test='createTime!=null and createTime!=""'>and create_time = #{createTime,jdbcType=VARCHAR}</if>
+    </select>
+    
+    <select id="listNoticeRulesCountAll" parameterType="com.hand.bdss.web.entity.NoticeRuleEntity" resultType="int">
+       select
+       count(1)
+       from tb_mail_notice_rule
+       where
+       1=1   
+		<if test='mailChannelId!=null and mailChannelId!=""'>and mail_channel_id = #{mailChannelId,jdbcType=INTEGER}</if>
+		<if test='ruleName!=null and ruleName!=""'>and rule_name like CONCAT('%',#{ruleName,jdbcType=VARCHAR},'%')</if>
+		<if test='triggerRule!=null and triggerRule!=""'>and trigger_rule = #{triggerRule,jdbcType=VARCHAR}</if>
+		<if test='triggerCondition!=null and triggerCondition!=""'>and trigger_condition = #{triggerCondition,jdbcType=VARCHAR}</if>
+		<if test='ruleNum!=null and ruleNum!=""'>and rule_num = #{ruleNum,jdbcType=VARCHAR}</if>
+		<if test='noticeContent!=null and noticeContent!=""'>and notice_content = #{noticeContent,jdbcType=VARCHAR}</if>
+		<if test='createTime!=null and createTime!=""'>and create_time = #{createTime,jdbcType=VARCHAR}</if>
+    </select>
+    
+    <select id="listNoticeRuleAll" parameterType="com.hand.bdss.web.entity.NoticeRuleEntity" resultType="com.hand.bdss.web.entity.NoticeRuleEntity">
+       select
+       a.id as id,
+       a.mail_channel_id as mailChannelId,
+       a.rule_name as ruleName,
+       a.trigger_rule as triggerRule,
+       a.trigger_condition as triggerCondition,
+       if(a.trigger_rule = '数据使用率',concat(a.rule_num*100,'%'),if(a.trigger_rule = '集群状态',a.rule_num,'null')) as ruleNum,
+       a.notice_content as noticeContent,
+       a.create_time as createTime
+       from tb_mail_notice_rule a
+       where
+       1=1
+       <if test='mailChannelId!=null and mailChannelId!=""'>and mail_channel_id = #{mailChannelId,jdbcType=INTEGER}</if>
+		<if test='ruleName!=null and ruleName!=""'>and rule_name = #{ruleName,jdbcType=VARCHAR}</if>
+		<if test='triggerRule!=null and triggerRule!=""'>and trigger_rule = #{triggerRule,jdbcType=VARCHAR}</if>
+		<if test='triggerCondition!=null and triggerCondition!=""'>and trigger_condition = #{triggerCondition,jdbcType=VARCHAR}</if>
+		<if test='ruleNum!=null and ruleNum!=""'>and rule_num = #{ruleNum,jdbcType=VARCHAR}</if>
+		<if test='noticeContent!=null and noticeContent!=""'>and notice_content = #{noticeContent,jdbcType=VARCHAR}</if>
+		<if test='createTime!=null and createTime!=""'>and create_time = #{createTime,jdbcType=VARCHAR}</if>    
+     </select>
+     
+     <update id="updateNoticeRule" parameterType="com.hand.bdss.web.entity.NoticeRuleEntity">
+     	update tb_mail_notice_rule a set
+     	a.id = #{id,jdbcType=INTEGER},
+        a.mail_channel_id = #{mailChannelId,jdbcType=INTEGER},
+        a.rule_name = #{ruleName,jdbcType=VARCHAR},
+        a.trigger_rule = #{triggerRule,jdbcType=VARCHAR},
+        a.trigger_condition = #{triggerCondition,jdbcType=VARCHAR},
+        a.rule_num = #{ruleNum,jdbcType=VARCHAR},
+        a.notice_content = #{noticeContent,jdbcType=VARCHAR},
+        a.update_time = SYSDATE()
+        where
+        1=1
+		<if test='id!=null and id!=""'>and id = #{id,jdbcType=INTEGER}</if>
+    </update>
+     
+     <delete id="deleteNoticeRule" parameterType="list">
+		delete from tb_mail_notice_rule where
+		id in
+		<foreach collection="list" index="index" item="tag" open="("
+			separator="," close=")">
+			#{tag.id,jdbcType=BIGINT}
+		</foreach>
+	</delete>
+	
+</mapper>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hand.bdss.web.entity.AIOptsEntity">
+	<!-- 根据条件查询组件属性 -->
+	<select id="listAIOpts" parameterType="java.util.Map" resultType="com.hand.bdss.web.entity.AIOptsEntity">
+		select 
+		a.id as id,
+		a.com_code as comCode,
+		b.right_click_menu_type as rightOption,
+		a.tab as tab,
+		a.tab_name as tabName,
+		a.opt as opt,
+		a.opt_name as optName,
+		a.opt_type as optType,
+		a.opt_display as optDisplay,
+		a.opt_prompt as optPrompt,
+		a.opt_necessary as optNecessary,
+		a.opt_display_index as optIndex,
+		a.opt_default_v as optDefault,
+		a.opt_descr as optDescr,
+		a.opt_v_supported as optSupported,
+		a.opt_v_type_supported as optTypeSupported
+		from tb_ai_com_opts a left join tb_ai_left_com_tree b 
+		on a.com_code = b.com_code
+		where 1=1 
+		<if test='comName!=null and comName!=""'>and b.com_name = #{comName,jdbcType=VARCHAR}</if>
+		<if test='id!=null and id!=""'>and id = #{id,jdbcType=BIGINT}</if>
+		<if test='comCode!=null and comCode!=""'>and a.com_code = #{comCode,jdbcType=VARCHAR}</if>
+		<if test='tab!=null and tab!=""'>and tab = #{tab,jdbcType=VARCHAR}</if>
+		<if test='tabName!=null and tabName!=""'>and tab_name = #{tabName,jdbcType=VARCHAR}</if>
+		order by a.opt_display_index
+	</select>
+	
+</mapper>
