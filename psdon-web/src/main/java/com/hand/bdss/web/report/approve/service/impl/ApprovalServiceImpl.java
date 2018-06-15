@@ -102,9 +102,9 @@ public class ApprovalServiceImpl implements ApprovalService {
 			QuartzManager.addJob(schedulerFactoryBean.getScheduler(), "monitorOverStatusJob$"+UUID.randomUUID().toString(), map, MonitorOverStatusJob.class, cron);
 			
 		}
-		// 如果两个审批人的审批状态都是已拒绝的话，则邮件通知申请人
+		// 如果当前审批人的审批状态是已拒绝，另外一个审批人的审批状态不是拒绝状态，则邮件通知申请人
 		if (ApplyState.disagreeApproved.getIndex() == nowApproval.getApprovalStatus()
-				&& ApplyState.disagreeApproved.getIndex() == otherApproval.getApprovalStatus()) {
+				&& ApplyState.disagreeApproved.getIndex() != otherApproval.getApprovalStatus()) {
 			//发邮件通知申请人
 			emailEntity.setReceiveAcount(apply.getApperyer().getEmail());
 			SendEmailUtils.sendEmailSMTP(emailEntity, Global.APPROVAL_REFUSE_CONTENT);
